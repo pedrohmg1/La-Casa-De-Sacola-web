@@ -7,11 +7,11 @@ import AuthPasswordField from "../components/auth/AuthPasswordField";
 import AuthTextLink from "../components/auth/AuthTextLink";
 import styles from "../components/auth/auth.module.css";
 
-export default function Login() {
+export default function Cadastro() {
   return (
     <>
       <meta charSet="UTF-8" />
-      <title>Login</title>
+      <title>Cadastro</title>
 
       <link
         href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Quicksand:wght@500;700&display=swap"
@@ -20,28 +20,25 @@ export default function Login() {
 
       <AuthBackground>
         <AuthCard>
-          <h1 className={`${styles.reveal} ${styles.d1} ${styles.title} font-extrabold`}>Login</h1>
+          <h1 className={`${styles.reveal} ${styles.d1} ${styles.title} font-extrabold`}>Cadastro</h1>
           <p className={`${styles.reveal} ${styles.d2} ${styles.titleSub} mt-2`}>
-            Entre e transforme suas sacolas em parte da sua marca
+            Crie sua conta e comece a vender suas sacolas
           </p>
 
           <form className={`${styles.formBlock} mt-8 flex flex-col`}>
-            <AuthField type="email" placeholder="Email" revealClass={styles.d2} />
-            <AuthPasswordField placeholder="Senha" revealClass={styles.d3} />
-
-            <AuthTextLink href="#" alignRight revealClass={`${styles.reveal} ${styles.d4}`}>
-              Esqueci minha senha
-            </AuthTextLink>
+            <AuthField type="text" placeholder="Nome completo" revealClass={styles.d2} />
+            <AuthField type="email" placeholder="Email" revealClass={styles.d3} />
+            <AuthPasswordField placeholder="Senha" revealClass={styles.d4} />
 
             <AuthButton type="submit" revealClass={styles.d5}>
-              Entrar
+              Cadastrar
             </AuthButton>
           </form>
 
           <p className={`${styles.reveal} ${styles.d5} mt-7 text-center text-[#3f705d]`}>
-            Nao tem conta?{" "}
-            <Link href="/cadastro" className={`${styles.softLink} font-semibold underline-offset-4 hover:underline`}>
-              Criar conta
+            Já tem conta?{" "}
+            <Link href="/login" className={`${styles.softLink} font-semibold underline-offset-4 hover:underline`}>
+              Voltar para login
             </Link>
           </p>
         </AuthCard>
