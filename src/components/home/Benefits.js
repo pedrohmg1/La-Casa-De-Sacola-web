@@ -47,7 +47,7 @@ export default function Benefits() {
               key={benefit.title}
               className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 rounded-2xl hover:bg-[#f0faf5] transition-colors group"
             >
-              <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-[#f0faf5] group-hover:bg-[#e0f5ea] flex items-center justify-center text-[#3ca779] transition-colors">
+              <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-[#f4f7f5] group-hover:bg-[#e0f5ea] flex items-center justify-center text-[#8f0000] transition-colors">
                 {benefit.icon}
               </div>
               <div>

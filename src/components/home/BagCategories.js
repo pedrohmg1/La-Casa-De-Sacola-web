@@ -6,7 +6,6 @@ const bags = [
   {
     id: "kraft",
     name: "Sacola Kraft",
-    emoji: "🛍️",
     description: "Resistente e sustentável, feita de papel kraft. Ideal para lojas de moda, presentes e produtos premium.",
     minQty: 50,
     grammages: ["80g/m²", "100g/m²", "120g/m²"],
@@ -22,7 +21,6 @@ const bags = [
   {
     id: "papel",
     name: "Sacola de Papel",
-    emoji: "📦",
     description: "Versátil e elegante, com acabamento liso ou texturizado. Perfeita para embalagens sofisticadas.",
     minQty: 100,
     grammages: ["120g/m²", "150g/m²", "180g/m²"],
@@ -38,7 +36,6 @@ const bags = [
   {
     id: "plastica",
     name: "Sacola Plástica",
-    emoji: "🏪",
     description: "Durável e impermeável, com impressão em alta definição. Ideal para supermercados e varejo.",
     minQty: 200,
     grammages: ["0,06mm", "0,08mm", "0,10mm"],
@@ -54,7 +51,6 @@ const bags = [
   {
     id: "cordao",
     name: "Sacola com Cordão",
-    emoji: "👜",
     description: "Sofisticada com alça de cordão. Transmite exclusividade e é perfeita para presentes e eventos.",
     minQty: 50,
     grammages: ["150g/m²", "180g/m²", "250g/m²"],
@@ -90,24 +86,6 @@ export default function BagCategories() {
           <p className="text-[#6b9e8a] text-lg max-w-2xl mx-auto">
             Quatro tipos de sacolas para cada necessidade do seu negócio. Todas com personalização completa da sua arte.
           </p>
-        </div>
-
-        {/* Tab selector */}
-        <div className="flex flex-wrap justify-center gap-3 mb-10">
-          {bags.map((bag) => (
-            <button
-              key={bag.id}
-              onClick={() => setActiveTab(bag.id)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl font-semibold text-sm transition-all ${
-                activeTab === bag.id
-                  ? "bg-[#264f41] text-white shadow-lg shadow-[#264f41]/20"
-                  : "bg-[#f0faf5] text-[#3a5c4e] hover:bg-[#e0f5ea]"
-              }`}
-            >
-              <span>{bag.emoji}</span>
-              {bag.name}
-            </button>
-          ))}
         </div>
 
         {/* Active bag detail */}

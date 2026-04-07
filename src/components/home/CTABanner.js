@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function CTABanner() {
   return (
-    <section className="py-20 bg-gradient-to-br from-[#0c1a14] via-[#1a3828] to-[#0f2a1e] relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-br from-[#292622] via-[#1a3828] to-[#5ab58f] relative overflow-hidden">
       {/* Background decorations */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-[#61c39a] opacity-[0.06] blur-3xl" />
@@ -19,7 +19,7 @@ export default function CTABanner() {
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="inline-flex items-center gap-2 bg-[#61c39a]/10 border border-[#61c39a]/30 rounded-full px-4 py-1.5 mb-6">
           <span className="w-2 h-2 rounded-full bg-[#61c39a] animate-pulse" />
-          <span className="text-[#61c39a] text-sm font-medium">Pedido mínimo a partir de 50 unidades</span>
+          <span className="text-[#61c39a] text-sm font-medium">Pedido mínimo a partir de 200 unidades</span>
         </div>
 
         <h2
@@ -32,7 +32,7 @@ export default function CTABanner() {
           </span>
         </h2>
 
-        <p className="text-[#a8c4b8] text-lg mb-10 max-w-2xl mx-auto">
+        <p className="text-[#f4f7f5] text-lg mb-10 max-w-2xl mx-auto">
           Cada sacola é uma oportunidade de fortalecer sua marca. Comece agora com um pedido personalizado 
           e veja a diferença que uma embalagem de qualidade faz.
         </p>
@@ -49,28 +49,13 @@ export default function CTABanner() {
           </Link>
           <Link
             href="#contato"
-            className="inline-flex items-center justify-center gap-2 border border-[#61c39a]/40 text-[#61c39a] hover:bg-[#61c39a]/10 font-semibold text-base px-8 py-4 rounded-2xl transition-all"
+            className="inline-flex items-center justify-center gap-2 border border-[#f4f7f5]/40 text-[#f4f7f5] hover:bg-[#f4f7f5]/10 font-semibold text-base px-8 py-4 rounded-2xl transition-all"
           >
             <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
             Falar com a equipe
           </Link>
-        </div>
-
-        {/* Trust indicators */}
-        <div className="mt-12 flex flex-wrap justify-center gap-6 text-[#7aaa96] text-sm">
-          {[
-            { icon: "🔒", text: "Pagamento seguro" },
-            { icon: "📦", text: "Entrega rastreada" },
-            { icon: "✅", text: "Qualidade garantida" },
-            { icon: "🏠", text: "Empresa familiar" },
-          ].map((item) => (
-            <div key={item.text} className="flex items-center gap-1.5">
-              <span>{item.icon}</span>
-              <span>{item.text}</span>
-            </div>
-          ))}
         </div>
       </div>
     </section>

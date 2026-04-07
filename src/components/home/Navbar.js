@@ -6,10 +6,10 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-[#e4f4ed]">
+    <header className="sticky top-0 z-50 bg-[#f4f7f5] shadow-sm border-b border-[#e4f4ed]">
       {/* Top bar */}
-      <div className="bg-[#264f41] text-white text-xs py-1.5 text-center font-medium tracking-wide">
-        🎁 Frete grátis para pedidos acima de R$500 &nbsp;|&nbsp; Qualidade garantida ou seu dinheiro de volta
+      <div className="bg-[#292622] text-white text-xs py-1.5 text-center font-medium tracking-wide">
+        🎁 Frete grátis para pedidos acima de R$500 &nbsp;|&nbsp; La Casa de Sacola
       </div>
 
       {/* Main nav */}
@@ -17,7 +17,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#61c39a] to-[#3ca779] flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#292622] to-[#8f0000] flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <line x1="3" y1="6" x2="21" y2="6" stroke="white" strokeWidth="2" strokeLinecap="round"/>
@@ -28,7 +28,7 @@ export default function Navbar() {
               <span className="font-extrabold text-[#264f41] text-lg tracking-tight" style={{ fontFamily: "'Quicksand', sans-serif" }}>
                 La Casa
               </span>
-              <span className="text-[#61c39a] text-xs font-semibold tracking-widest uppercase">de Sacola</span>
+              <span className="text-[#8f0000] text-xs font-semibold tracking-widest uppercase">de Sacola</span>
             </div>
           </Link>
 
@@ -52,13 +52,13 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             <Link
               href="/login"
-              className="text-sm font-semibold text-[#3ca779] border border-[#61c39a] rounded-xl px-4 py-2 hover:bg-[#f0faf5] transition-colors"
+              className="text-sm font-semibold text-[#8f0000] border border-[#8f0000] rounded-xl px-4 py-2 hover:bg-[#f0faf5] transition-colors"
             >
               Entrar
             </Link>
             <Link
               href="/cadastro"
-              className="text-sm font-semibold text-white bg-[#3ca779] rounded-xl px-4 py-2 hover:bg-[#2e8f65] transition-colors shadow-sm"
+              className="text-sm font-semibold text-white bg-[#5ab58f] rounded-xl px-4 py-2 hover:bg-[#2e8f65] transition-colors shadow-sm"
             >
               Fazer Pedido
             </Link>

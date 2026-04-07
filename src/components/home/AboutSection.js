@@ -23,7 +23,7 @@ export default function AboutSection() {
   ];
 
   return (
-    <section className="py-20 bg-[#f8fdfb]">
+    <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-14 items-center">
           {/* Left: Text */}
@@ -89,23 +89,6 @@ export default function AboutSection() {
               </div>
             ))}
 
-            {/* Large card */}
-            <div className="col-span-2 bg-gradient-to-br from-[#264f41] to-[#1a3828] rounded-3xl p-6 text-white">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-2xl bg-[#61c39a]/20 flex items-center justify-center text-xl">
-                  🌱
-                </div>
-                <div>
-                  <p className="font-bold text-sm">Compromisso Sustentável</p>
-                  <p className="text-[#7aaa96] text-xs">Responsabilidade ambiental</p>
-                </div>
-              </div>
-              <p className="text-[#a8c4b8] text-sm leading-relaxed">
-                Priorizamos materiais recicláveis e processos sustentáveis. 
-                Nossas sacolas kraft são feitas de papel certificado FSC, 
-                contribuindo para um futuro mais verde.
-              </p>
-            </div>
           </div>
         </div>
       </div>

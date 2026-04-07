@@ -2,14 +2,14 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer id="contato" className="bg-[#0c1a14] text-white">
+    <footer id="contato" className="bg-[#292622] text-white">
       {/* Main footer */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#61c39a] to-[#3ca779] flex items-center justify-center shadow-md">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#292622] to-[#8f0000] flex items-center justify-center shadow-md">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   <line x1="3" y1="6" x2="21" y2="6" stroke="white" strokeWidth="2" strokeLinecap="round"/>
@@ -20,10 +20,10 @@ export default function Footer() {
                 <span className="font-extrabold text-white text-lg tracking-tight" style={{ fontFamily: "'Quicksand', sans-serif" }}>
                   La Casa
                 </span>
-                <span className="text-[#61c39a] text-xs font-semibold tracking-widest uppercase">de Sacola</span>
+                <span className="text-[#cd1515] text-xs font-semibold tracking-widest uppercase">de Sacola</span>
               </div>
             </Link>
-            <p className="text-[#7aaa96] text-sm leading-relaxed mb-5">
+            <p className="text-[#cbc0b7] text-sm leading-relaxed mb-5">
               Gráfica familiar especializada em sacolas personalizadas. 
               Qualidade e cuidado em cada pedido desde 2010.
             </p>
@@ -50,7 +50,7 @@ export default function Footer() {
                 <a
                   key={social.name}
                   href="#"
-                  className="w-9 h-9 rounded-xl bg-white/5 hover:bg-[#3ca779] flex items-center justify-center text-[#7aaa96] hover:text-white transition-all"
+                  className="w-9 h-9 rounded-xl bg-white/5 hover:bg-[#8f0000] flex items-center justify-center text-white hover:text-white transition-all"
                   aria-label={social.name}
                 >
                   {social.icon}
@@ -65,7 +65,7 @@ export default function Footer() {
             <ul className="space-y-2.5">
               {["Sacola Kraft", "Sacola de Papel", "Sacola Plástica", "Sacola com Cordão"].map((item) => (
                 <li key={item}>
-                  <Link href="#categorias" className="text-[#7aaa96] hover:text-[#61c39a] text-sm transition-colors">
+                  <Link href="#categorias" className="text-[#cbc0b7] hover:text-[#cd1515] text-sm transition-colors">
                     {item}
                   </Link>
                 </li>
@@ -81,11 +81,9 @@ export default function Footer() {
                 { label: "Sobre nós", href: "#" },
                 { label: "Como funciona", href: "#como-funciona" },
                 { label: "Avaliações", href: "#avaliacoes" },
-                { label: "Blog", href: "#" },
-                { label: "Política de privacidade", href: "#" },
               ].map((item) => (
                 <li key={item.label}>
-                  <Link href={item.href} className="text-[#7aaa96] hover:text-[#61c39a] text-sm transition-colors">
+                  <Link href={item.href} className="text-[#cbc0b7] hover:text-[#cd1515] text-sm transition-colors">
                     {item.label}
                   </Link>
                 </li>
@@ -97,20 +95,20 @@ export default function Footer() {
           <div>
             <h4 className="font-bold text-white mb-4 text-sm uppercase tracking-wider">Contato</h4>
             <ul className="space-y-3">
-              <li className="flex items-start gap-2.5 text-[#7aaa96] text-sm">
-                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 mt-0.5 text-[#61c39a]">
+              <li className="flex items-start gap-2.5 text-[#cbc0b7] text-sm">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 mt-0.5 text-[#cbc0b7]">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
                 contato@lacasadesacola.com.br
               </li>
-              <li className="flex items-start gap-2.5 text-[#7aaa96] text-sm">
-                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 mt-0.5 text-[#61c39a]">
+              <li className="flex items-start gap-2.5 text-[#cbc0b7] text-sm">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 mt-0.5 text-[#cbc0b7]">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
                 (11) 99999-9999
               </li>
-              <li className="flex items-start gap-2.5 text-[#7aaa96] text-sm">
-                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 mt-0.5 text-[#61c39a]">
+              <li className="flex items-start gap-2.5 text-[#cbc0b7] text-sm">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 mt-0.5 text-[#cbc0b7]">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
@@ -120,14 +118,14 @@ export default function Footer() {
 
             {/* Newsletter */}
             <div className="mt-6">
-              <p className="text-[#7aaa96] text-xs mb-2">Receba novidades e promoções:</p>
+              <p className="text-[#cbc0b7] text-xs mb-2">Receba novidades e promoções:</p>
               <div className="flex gap-2">
                 <input
                   type="email"
                   placeholder="Seu e-mail"
-                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder-[#4a7a66] focus:outline-none focus:border-[#61c39a] transition-colors"
+                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder-[#cbc0b7] focus:outline-none focus:border-[#61c39a] transition-colors"
                 />
-                <button className="bg-[#3ca779] hover:bg-[#2e8f65] text-white px-3 py-2 rounded-xl transition-colors">
+                <button className="bg-[#8f0000] text-white px-3 py-2 rounded-xl transition-colors">
                   <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
@@ -141,14 +139,9 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-[#4a7a66] text-xs">
+          <p className="text-[#cbc0b7] text-xs">
             © 2026 La Casa de Sacola. Todos os direitos reservados.
           </p>
-          <div className="flex items-center gap-4">
-            <Link href="#" className="text-[#4a7a66] hover:text-[#61c39a] text-xs transition-colors">Termos de uso</Link>
-            <Link href="#" className="text-[#4a7a66] hover:text-[#61c39a] text-xs transition-colors">Privacidade</Link>
-            <Link href="#" className="text-[#4a7a66] hover:text-[#61c39a] text-xs transition-colors">Cookies</Link>
-          </div>
         </div>
       </div>
     </footer>
