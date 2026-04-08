@@ -24,28 +24,14 @@ export default function Login() {
 
       <AuthBackground>
         <AuthCard>
-          <h1 className={`${styles.reveal} ${styles.d1} ${styles.title} font-extrabold`}>Login</h1>
+          <h1 className={`${styles.reveal} ${styles.d1} ${styles.title} font-extrabold`}>PAGINA TESTE</h1>
           <p className={`${styles.reveal} ${styles.d2} ${styles.titleSub} mt-2`}>
-            Entre e transforme suas sacolas em parte da sua marca
+            Significa que o usuário logou<br></br>Porém não há nenhum tipo de persistencia/verificação pra validar isso <span className={'italic'}>(ainda)</span>
           </p>
 
-          <form onSubmit={handleSignIn} className={`${styles.formBlock} mt-8 flex flex-col`}>
-            <AuthField 
-            type="email" 
-            placeholder="Email" 
-            revealClass={styles.d2} 
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            required
-          />
-          
-          <AuthPasswordField 
-            placeholder="Senha" 
-            revealClass={styles.d3} 
-            value={formData.senha}
-            onChange={(e) => setFormData({ ...formData, senha: e.target.value })}
-            required
-          />
+          <form className={`${styles.formBlock} mt-8 flex flex-col`}>
+            <AuthField type="email" placeholder="Email" revealClass={styles.d2} />
+            <AuthPasswordField placeholder="Senha" revealClass={styles.d3} />
 
             <AuthTextLink href="#" alignRight revealClass={`${styles.reveal} ${styles.d4}`}>
               Esqueci minha senha
