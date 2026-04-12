@@ -310,7 +310,8 @@ export default function Painel() {
       </Dialog.Root>
 </div>
 
-<div className="overflow-x-auto overflow-y-auto border-2 rounded-t-xl flex-1 custom-scrollbar">
+<div className="flex-1 min-h-0">
+<div className="max-h-full overflow-auto border-2 rounded-t-xl custom-scrollbar">
 <table className="w-full text-left">
   <thead className="sticky top-0 z-10 bg-zinc-800 text-white border-b-2 border-zinc-500">
     <tr className="bg-zinc-800 text-white">
@@ -344,7 +345,7 @@ export default function Painel() {
 </tbody>
 </table>
 </div>
-
+</div>
 
 
       
