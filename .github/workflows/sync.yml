@@ -2,8 +2,8 @@ name: Sync Fork Automático
 
 on:
   schedule:
-    - cron: '0 * * * *' # Roda automaticamente a cada 1 hora
-  workflow_dispatch: # Permite que você clique em um botão para sincronizar na hora
+    - cron: '0 * * * *' # Roda a cada hora
+  workflow_dispatch: # Permite rodar manual
 
 jobs:
   sync:
@@ -13,11 +13,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
+      
       - name: Sync Upstream
-        uses: dabreadman/sync-upstream-github@v1.3.0
-        with:
-          upstream_repository: Mateus-SR/La-Casa-De-Sacola
-          upstream_branch: main
-          target_branch: main
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+        # Essa aqui é a ferramenta oficial do GitHub CLI
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh repo sync pedrohmg1/La-Casa-De-Sacola-web -b main
