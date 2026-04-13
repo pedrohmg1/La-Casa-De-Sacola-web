@@ -3,7 +3,7 @@
 import Link from "next/link";
 import useLoginHook from "../hooks/loginHook.js" // precisa trocar pra um que valide se o usuário já está logado (ou então adicionar essa logica dentro do loginHook)
 import RotaAdmin from "../components/admin/rotaAdmin"
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import * as Dialog from '@radix-ui/react-dialog';
 import * as Select from '@radix-ui/react-select';
 import * as Checkbox from '@radix-ui/react-checkbox'
@@ -212,6 +212,21 @@ export default function Painel() {
     setModalAberto(true);                    // Abre o modal
   };
 
+  const handleAbrirNovaSacola = () => {
+    setSacolaEditandoId(null); 
+    
+    setNovaSacola({ 
+      nome_sac: '', 
+      tipo_sac: '', 
+      quantidademin_sac: '', 
+      precounitario_sac: '', 
+      tamanho_sac: '', 
+      peso_sac: '', 
+      status_sac: '' 
+    });
+    
+  };
+
   return (
     <RotaAdmin>
     <main className="p-5 m-auto bg-gray-100 h-screen flex flex-col">
@@ -276,7 +291,7 @@ export default function Painel() {
 
       {/* O BOTÃO QUE ABRE A JANELA */}
       <Dialog.Trigger asChild>
-          <button className="bg-zinc-900 hover:bg-zinc-700 text-white px-4 py-2 rounded font-semibold transition shadow-sm text-sm lg:text-md">
+          <button className="bg-zinc-900 hover:bg-zinc-700 text-white px-4 py-2 rounded font-semibold transition shadow-sm text-sm lg:text-md" onClick={handleAbrirNovaSacola}>
             + Nova Sacola
           </button>
         </Dialog.Trigger>
