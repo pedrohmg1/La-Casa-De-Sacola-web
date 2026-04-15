@@ -65,13 +65,9 @@ export default function useLoginHook() {
       toast.success('Bem-vindo(a)!');
       setFormData({ email: '', senha: '' });
       
-      // 3. Redireciona com base no cargo após 2 segundos
+      // 3. Redireciona todos para a home após 2 segundos
       setTimeout(() => {
-        if (perfil?.cargo === 'administrador') {
-          router.push("/painel");
-        } else {
-          router.push("/");
-        }
+        router.push("/");
       }, 2000);
 
       setLoading(false);

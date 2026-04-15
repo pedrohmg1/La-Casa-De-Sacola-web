@@ -61,7 +61,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 bg-[#f4f7f5] shadow-sm border-b border-[#e4f4ed]">
       {/* Top bar */}
       <div className="bg-[#292622] text-white text-xs py-1.5 text-center font-medium tracking-wide">
-        🎁 Frete grátis para pedidos acima de R$500 &nbsp;|&nbsp; La Casa de Sacola
+         Frete grátis para pedidos acima de R$500 &nbsp;|&nbsp; La Casa de Sacola
       </div>
 
       {/* Main nav */}
@@ -86,12 +86,13 @@ export default function Navbar() {
 
           {/* Desktop nav links */}
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="#categorias" className="text-sm font-medium text-[#3a5c4e] hover:text-[#3ca779] transition-colors"> Sacolas </Link>
-            <Link href="#como-funciona" className="text-sm font-medium text-[#3a5c4e] hover:text-[#3ca779] transition-colors"> Como Funciona </Link>
+            <Link href="/#categorias" className="text-sm font-medium text-[#3a5c4e] hover:text-[#3ca779] transition-colors"> Sacolas </Link>
+            <Link href="/#sobre" className="text-sm font-medium text-[#3a5c4e] hover:text-[#3ca779] transition-colors"> Quem Somos </Link>
+            <Link href="/#como-funciona" className="text-sm font-medium text-[#3a5c4e] hover:text-[#3ca779] transition-colors"> Como Funciona </Link>
             {cargo === 'administrador' && (
               <Link href="/painel" className="text-sm font-bold text-[#8f0000] hover:text-red-700 transition-colors"> Painel Admin </Link>
             )}
-            <Link href="#contato" className="text-sm font-medium text-[#3a5c4e] hover:text-[#3ca779] transition-colors"> Contato </Link>
+            <Link href="/#contato" className="text-sm font-medium text-[#3a5c4e] hover:text-[#3ca779] transition-colors"> Contato </Link>
             <Link href="/catalogo" className="text-sm font-medium text-[#3a5c4e] hover:text-[#3ca779] transition-colors">
              Produtos Modelos
             </Link>
@@ -173,11 +174,12 @@ export default function Navbar() {
       {/* Mobile menu */}
       {menuOpen && (
         <div className="md:hidden bg-white border-t border-[#e4f4ed] px-4 pb-4 pt-2 flex flex-col gap-3">
-          <Link href="#categorias" className="text-sm font-medium text-[#3a5c4e] py-2" onClick={() => setMenuOpen(false)}>Sacolas</Link>
+          <Link href="/#categorias" className="text-sm font-medium text-[#3a5c4e] py-2" onClick={() => setMenuOpen(false)}>Sacolas</Link>
+          <Link href="/#sobre" className="text-sm font-medium text-[#3a5c4e] py-2" onClick={() => setMenuOpen(false)}>Quem Somos</Link>
           {cargo === 'administrador' && (
             <Link href="/painel" className="text-sm font-bold text-[#8f0000] py-2" onClick={() => setMenuOpen(false)}>Painel Administrador</Link>
           )}
-          <Link href="#contato" className="text-sm font-medium text-[#3a5c4e] py-2" onClick={() => setMenuOpen(false)}>Contato</Link>
+          <Link href="/#contato" className="text-sm font-medium text-[#3a5c4e] py-2" onClick={() => setMenuOpen(false)}>Contato</Link>
           
           <div className="flex flex-col gap-2 pt-2 border-t border-[#e4f4ed]">
             {!user ? (
