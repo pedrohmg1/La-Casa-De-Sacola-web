@@ -1,4 +1,3 @@
-import Navbar from "../components/layout/Navbar";
 import Hero from "../components/home/Hero";
 import Benefits from "../components/home/Benefits";
 import BagCategories from "../components/home/BagCategories";
@@ -20,7 +19,6 @@ export default function HomePage() {
         rel="stylesheet"
       />
       <div className="min-h-screen bg-white">
-        <Navbar />
         <Hero />
         <Benefits />
         <BagCategories />
