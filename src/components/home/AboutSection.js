@@ -23,7 +23,7 @@ export default function AboutSection() {
   ];
 
   return (
-    <section className="py-20 bg-white">
+    <section id="sobre" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-14 items-center">
           {/* Left: Text */}
@@ -41,7 +41,7 @@ export default function AboutSection() {
             <p className="text-[#4a7a66] text-base leading-relaxed mb-5">
               A La Casa de Sacola nasceu da paixão de uma família pelo universo gráfico. 
               Há mais de 15 anos, transformamos a identidade visual de marcas em sacolas 
-              que encantam clientes e fortalecem negócios.
+              que encantam clientes e fortalecer negócios.
             </p>
             <p className="text-[#4a7a66] text-base leading-relaxed mb-8">
               Cada pedido é tratado com cuidado e atenção individual. Nossa equipe acompanha 
@@ -88,7 +88,6 @@ export default function AboutSection() {
                 <div className="text-[#6b9e8a] text-sm">{item.label}</div>
               </div>
             ))}
-
           </div>
         </div>
       </div>
