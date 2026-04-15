@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
-import Navbar from "../components/layout/Navbar";
-import Footer from "../components/layout/Footer";
 import { ChevronLeftIcon, ChevronRightIcon, MixerHorizontalIcon, Cross2Icon } from "@radix-ui/react-icons";
 
 export default function ProdutosModelos() {
@@ -32,15 +30,27 @@ export default function ProdutosModelos() {
   }, [paginaAtual, filtroTipo, filtroTamanho, filtroCor]);
 
   const carregarOpcoesFiltros = async () => {
-    const { data: tipos } = await supabase.from('tipo').select('tipo_tip');
-    if (tipos) setOpcoesTipo(tipos.map(t => t.tipo_tip));
+  // Busca os tipos
+  const { data: tipos } = await supabase.from('tipo').select('tipo_tip');
+  if (tipos) {
+    // Remove duplicatas transformando em um Set e depois de volta para Array
+    const tiposUnicos = [...new Set(tipos.map(t => t.tipo_tip))];
+    setOpcoesTipo(tiposUnicos);
+  }
 
-    const { data: tamanhos } = await supabase.from('tamanho').select('tamanho_tam');
-    if (tamanhos) setOpcoesTamanho(tamanhos.map(t => t.tamanho_tam));
+  // Faça o mesmo para tamanhos e cores para evitar o mesmo erro neles
+  const { data: tamanhos } = await supabase.from('tamanho').select('tamanho_tam');
+  if (tamanhos) {
+    const tamanhosUnicos = [...new Set(tamanhos.map(t => t.tamanho_tam))];
+    setOpcoesTamanho(tamanhosUnicos);
+  }
 
-    const { data: cores } = await supabase.from('cor').select('cor_cor');
-    if (cores) setOpcoesCor(cores.map(c => c.cor_cor));
-  };
+  const { data: cores } = await supabase.from('cor').select('cor_cor');
+  if (cores) {
+    const coresUnicas = [...new Set(cores.map(c => c.cor_cor))];
+    setOpcoesCor(coresUnicas);
+  }
+};
 
   const carregarProdutos = async () => {
     setLoading(true);
@@ -87,7 +97,7 @@ export default function ProdutosModelos() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      <Navbar />
+    
 
       <main className="flex-grow container mx-auto px-4 py-8 mt-20">
         {/* HEADER */}
@@ -229,19 +239,41 @@ export default function ProdutosModelos() {
           </div>
         )}
 
-        {/* PAGINAÇÃO */}
-        {totalPaginas > 1 && (
-          <div className="flex justify-center items-center gap-3 mt-16">
-            <button 
-              onClick={() => setPaginaAtual(prev => Math.max(prev - 1, 1))}
-              disabled={paginaAtual === 1}
-              className="p-3 rounded-2xl border-2 border-[#c8e3d5] bg-white hover:bg-[#f0faf5] hover:border-[#3ca779] disabled:opacity-30 transition-all"
-            >
-              <ChevronLeftIcon className="w-5 h-5 text-[#3ca779]" />
-            </button>
+        {/* PAGINAÇÃO AJUSTADA */}
+{totalPaginas > 1 && (
+  <div className="flex justify-center items-center gap-3 mt-16">
+    <button 
+      onClick={() => setPaginaAtual(prev => Math.max(prev - 1, 1))}
+      disabled={paginaAtual === 1}
+      className="p-3 rounded-2xl border-2 border-[#c8e3d5] bg-white hover:bg-[#f0faf5] hover:border-[#3ca779] disabled:opacity-30 transition-all"
+    >
+      <ChevronLeftIcon className="w-5 h-5 text-[#3ca779]" />
+    </button>
 
-            <div className="flex gap-2">
-              {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((num) => (
+    <div className="flex gap-2">
+      {(() => {
+        const paginas = [];
+        const maxBotoes = 5; // Quantidade de botões numerados centrais
+
+        if (totalPaginas <= maxBotoes + 2) {
+          // Se tiver poucas páginas, mostra todas
+          for (let i = 1; i <= totalPaginas; i++) paginas.push(i);
+        } else {
+          // Lógica para muitas páginas (ex: 1, 2, 3, 4, 5 ... 10)
+          let inicio = Math.max(1, paginaAtual - 2);
+          let fim = Math.min(totalPaginas, inicio + maxBotoes - 1);
+
+          if (fim === totalPaginas) inicio = totalPaginas - maxBotoes + 1;
+
+          // Adiciona as páginas do intervalo calculado
+          for (let i = inicio; i <= fim; i++) {
+            paginas.push(i);
+          }
+
+          // Adiciona os "..." e a última página se necessário
+          return (
+            <>
+              {paginas.map((num) => (
                 <button
                   key={num}
                   onClick={() => setPaginaAtual(num)}
@@ -254,20 +286,51 @@ export default function ProdutosModelos() {
                   {num}
                 </button>
               ))}
-            </div>
+              
+              {fim < totalPaginas && (
+                <>
+                  {fim < totalPaginas - 1 && <span className="flex items-end pb-2 text-[#3ca779] font-bold">...</span>}
+                  <button
+                    onClick={() => setPaginaAtual(totalPaginas)}
+                    className="w-12 h-12 rounded-2xl border-2 bg-white text-[#264f41] border-[#c8e3d5] font-bold hover:border-[#3ca779] hover:bg-[#f0faf5]"
+                  >
+                    {totalPaginas}
+                  </button>
+                </>
+              )}
+            </>
+          );
+        }
 
-            <button 
-              onClick={() => setPaginaAtual(prev => Math.min(prev + 1, totalPaginas))}
-              disabled={paginaAtual === totalPaginas}
-              className="p-3 rounded-2xl border-2 border-[#c8e3d5] bg-white hover:bg-[#f0faf5] hover:border-[#3ca779] disabled:opacity-30 transition-all"
-            >
-              <ChevronRightIcon className="w-5 h-5 text-[#3ca779]" />
-            </button>
-          </div>
-        )}
+        // Caso base (poucas páginas)
+        return paginas.map((num) => (
+          <button
+            key={num}
+            onClick={() => setPaginaAtual(num)}
+            className={`w-12 h-12 rounded-2xl border-2 font-bold transition-all ${
+              paginaAtual === num 
+                ? 'bg-[#3ca779] text-white border-[#3ca779] scale-110 shadow-lg shadow-[#3ca779]/30' 
+                : 'bg-white text-[#264f41] border-[#c8e3d5] hover:border-[#3ca779] hover:bg-[#f0faf5]'
+            }`}
+          >
+            {num}
+          </button>
+        ));
+      })()}
+    </div>
+
+    <button 
+      onClick={() => setPaginaAtual(prev => Math.min(prev + 1, totalPaginas))}
+      disabled={paginaAtual === totalPaginas}
+      className="p-3 rounded-2xl border-2 border-[#c8e3d5] bg-white hover:bg-[#f0faf5] hover:border-[#3ca779] disabled:opacity-30 transition-all"
+    >
+      <ChevronRightIcon className="w-5 h-5 text-[#3ca779]" />
+    </button>
+  </div>
+)}
       </main>
 
-      <Footer />
+      
     </div>
   );
 }
