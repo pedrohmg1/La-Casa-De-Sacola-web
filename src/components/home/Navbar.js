@@ -92,6 +92,9 @@ export default function Navbar() {
               <Link href="/painel" className="text-sm font-bold text-[#8f0000] hover:text-red-700 transition-colors"> Painel Admin </Link>
             )}
             <Link href="#contato" className="text-sm font-medium text-[#3a5c4e] hover:text-[#3ca779] transition-colors"> Contato </Link>
+            <Link href="/catalogo" className="text-sm font-medium text-[#3a5c4e] hover:text-[#3ca779] transition-colors">
+             Produtos Modelos
+            </Link>
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
