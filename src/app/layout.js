@@ -1,5 +1,5 @@
 import './globals.css';
-import Navbar from '../components/layout/Navbar';
+import NavbarWrapper from '../components/layout/NavbarWrapper';
 
 export const metadata = {
   title: 'La Casa de Sacola — Sacolas Personalizadas',
@@ -16,7 +16,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body style={{ fontFamily: "'Manrope', sans-serif" }}>
-        <Navbar />
+        <NavbarWrapper />
         {children}
       </body>
     </html>
