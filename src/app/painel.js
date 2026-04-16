@@ -7,6 +7,8 @@ import { useState, useEffect } from "react";
 import * as Dialog from '@radix-ui/react-dialog';
 import * as Select from '@radix-ui/react-select';
 import * as Checkbox from '@radix-ui/react-checkbox';
+import * as Tabs from '@radix-ui/react-tabs';
+import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import { supabase } from "../lib/supabaseClient";
 import { 
   Pencil2Icon, 
@@ -15,7 +17,9 @@ import {
   ExclamationTriangleIcon, 
   PlusIcon, 
   TrashIcon, 
-  EyeClosedIcon 
+  EyeClosedIcon,
+  GearIcon,
+  UpdateIcon
 } from "@radix-ui/react-icons";
 
 export default function Painel() {
@@ -45,24 +49,41 @@ export default function Painel() {
       }, []); // 👈 Esse colchete vazio é vital! Ele diz ao React: "Rode isso apenas UMA VEZ ao abrir a página."
     
       const carregarFiltros = async () => {
-        const { data: tipo, error: erroMat } = await supabase.from('tipo').select('tipo_tip');
-        if (tipo) setOpcoesMaterial(tipo.map(t => t.tipo_tip));
+        const { data: tipo, error: erroMat } = await supabase
+          .from('tipo')
+          .select('id_tip, tipo_tip')
+          .neq('excluido', true);
+        //if (tipo) setOpcoesMaterial(tipo.map(t => t.tipo_tip));
+        if (tipo) setOpcoesMaterial(tipo);
     
-        const { data: tamanho } = await supabase.from('tamanho').select('tamanho_tam');
-        if (tamanho) setOpcoesTamanho(tamanho.map(t => t.tamanho_tam));
-      };
+        const { data: tamanho } = await supabase
+          .from('tamanho')
+          .select('id_tam, tamanho_tam')
+          .neq('excluido', true);
+          //if (tamanho) setOpcoesTamanho(tamanho.map(t => t.tamanho_tam));
+          if (tamanho) setOpcoesTamanho(tamanho);
+        };
     
       const [sacolas, setSacolas] = useState([
         { id_sac: 1, nome_sac: 'Carregando', tipo_sac: 'Carregando', quantidademin_sac: 0, precounitario_sac: 0, tamanho_sac: 'Carregando', peso_sac: 'Carregando', status_sac: 'Carregando' },
       ]);
     
+      // pendente: comentar todos esses carinhas aqui
       const [opcoesMaterial, setOpcoesMaterial] = useState([]);
       const [opcoesTamanho, setOpcoesTamanho] = useState([]);
-    
+
       const [modalEnumAberto, setModalEnumAberto] = useState(false);
       const [enumAtual, setEnumAtual] = useState("");
       const [novoValorEnum, setNovoValorEnum] = useState("");
-    
+      const [enumEditandoId, setEnumEditandoId] = useState(null)
+
+      const [modalAberto, setModalAberto] = useState(false);
+
+      const [sacolaEditandoId, setSacolaEditandoId] = useState(null);
+
+      const [mostrarSacolasAtivas, setMostrarSacolasAtivas] = useState(true);
+      const [mostrarSacolasOcultas, setMostrarSacolasOcultas] = useState(false);
+
       const [novaSacola, setNovaSacola] = useState({
         nome_sac: '',
         tipo_sac: '',
@@ -145,12 +166,6 @@ export default function Painel() {
         setSacolaEditandoId(null);
       };
     
-      const [modalAberto, setModalAberto] = useState(false);
-      const [sacolaEditandoId, setSacolaEditandoId] = useState(null);
-    
-      const [mostrarSacolasAtivas, setMostrarSacolasAtivas] = useState(true);
-      const [mostrarSacolasOcultas, setMostrarSacolasOcultas] = useState(false);
-    
       const handleOcultarSacola = async () => {
         const { error } = await supabase
           .from('sacola')
@@ -181,7 +196,18 @@ export default function Painel() {
         // Define em qual tabela vamos inserir (materiais ou tamanhos)
         const tabelaAlvo = enumAtual === 'tipo' ? 'tipo' : 'tamanho';
         const nomeColuna = enumAtual === 'tipo' ? 'tipo_tip' : 'tamanho_tam';
+        const listaCerta = enumAtual === 'tipo' ? opcoesMaterial : opcoesTamanho;
     
+        const jaExiste = listaCerta.some(item => 
+          item[colunaNome].toLowerCase() === novoValorEnum.toLowerCase()
+        );
+      
+        if (jaExiste) {
+          // substituir esse alert eventualmente!
+          alert(`Erro: Este ${enumAtual === 'tipo' ? 'material' : 'tamanho'} já está cadastrado!`);
+          return; // Para a execução aqui e não envia para o banco
+        }
+
         // Faz um insert padrão na tabela escolhida
         const { error } = await supabase
           .from(tabelaAlvo)
@@ -194,6 +220,61 @@ export default function Painel() {
           await carregarFiltros(); 
           setModalEnumAberto(false);
           setNovoValorEnum("");      
+        }
+      };
+
+            // 1. Função para editar o nome de um item existente
+      const handleEditarValorEnum = async () => {
+        if (!novoValorEnum.trim() || !enumEditandoId) return;
+      
+        const listaCerta = enumAtual === 'tipo' ? opcoesMaterial : opcoesTamanho;
+        const tabelaAlvo = enumAtual === 'tipo' ? 'tipo' : 'tamanho';
+        const colunaNome = enumAtual === 'tipo' ? 'tipo_tip' : 'tamanho_tam';
+        const colunaId = enumAtual === 'tipo' ? 'id_tip' : 'id_tam';
+      
+        const jaExisteEmOutro = listaCerta.some(item => 
+          item[colunaNome].toLowerCase() === novoValorEnum.toLowerCase() && 
+          item[colunaId] !== enumEditandoId
+        );
+      
+        if (jaExisteEmOutro) {
+          // substituir esse alert eventualmente!
+          alert("Erro: Já existe outro item com este mesmo nome!");
+          return;
+        }
+
+        const { error } = await supabase
+          .from(tabelaAlvo)
+          .update({ [colunaNome]: novoValorEnum.trim() })
+          .eq(colunaId, enumEditandoId); // Usa o ID que guardamos no .find()
+      
+        if (error) {
+          console.error("Erro ao editar:", error);
+        } else {
+          await carregarFiltros(); // Atualiza os dropdowns da tela principal
+          setModalEnumAberto(false);
+          setEnumEditandoId(null);
+          setNovoValorEnum("");
+        }
+      };
+
+      // 2. Função para ocultar (soft delete)
+      const handleOcultarEnum = async (idParaOcultar) => {
+        const tabelaAlvo = enumAtual === 'tipo' ? 'tipo' : 'tamanho';
+        const colunaId = enumAtual === 'tipo' ? 'id_tip' : 'id_tam';
+      
+        const { error } = await supabase
+          .from(tabelaAlvo)
+          .update({ excluido: true })
+          .eq(colunaId, idParaOcultar);
+      
+        if (error) {
+          console.error("Erro ao ocultar:", error);
+        } else {
+          await carregarFiltros();
+          setModalEnumAberto(false);
+          setEnumEditandoId(null);
+          setNovoValorEnum("");    
         }
       };
     
@@ -294,7 +375,7 @@ export default function Painel() {
 
           <Dialog.Portal>
             <Dialog.Overlay className="bg-black/50 fixed inset-0 backdrop-blur-sm z-40" />
-            <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-2xl shadow-2xl w-[min(92vw,40rem)] max-h-[90vh] z-[100] overflow-y-auto custom-scrollbar">
+            <Dialog.Content aria-describedby={undefined} className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-2xl shadow-2xl w-[min(92vw,40rem)] max-h-[90vh] z-[100] overflow-y-auto custom-scrollbar">
               <Dialog.Title className="text-md lg:text-xl font-extrabold mb-6 text-[#264f41]">
                 {sacolaEditandoId ? 'Editar Sacola' : 'Adicionar Nova Sacola'}
               </Dialog.Title>
@@ -323,15 +404,21 @@ export default function Painel() {
                         <Select.Content className="bg-white rounded-xl shadow-2xl border border-gray-200 z-[110]">
                           <Select.Viewport className="p-2">
                             {opcoesMaterial.map((m) => (
-                              <Select.Item key={m} value={m} className="p-3 rounded-lg outline-none cursor-pointer hover:bg-[#f0faf5] focus:bg-[#f0faf5] transition text-sm lg:text-md font-extralight">
-                                <Select.ItemText>{m}</Select.ItemText>
+                              <Select.Item key={m.id_tip} value={m.tipo_tip} className="p-3 rounded-lg outline-none cursor-pointer hover:bg-[#f0faf5] focus:bg-[#f0faf5] transition text-sm lg:text-md font-extralight">
+                                <Select.ItemText>{m.tipo_tip}</Select.ItemText>
                               </Select.Item>
                             ))}
                           </Select.Viewport>
                         </Select.Content>
                       </Select.Portal>
                     </Select.Root>
-                    <button type="button" onClick={() => { setEnumAtual('tipo'); setModalEnumAberto(true); }} className="p-3 border border-gray-300 rounded-xl hover:bg-gray-50"><PlusIcon/></button>
+                    <button type="button" onClick={() => {
+                      setEnumAtual('tipo');
+                      setEnumEditandoId(null);
+                      setNovoValorEnum("");
+                      setModalEnumAberto(true);
+                      }}
+                      className="p-3 border border-gray-300 rounded-xl hover:bg-gray-50"><GearIcon/></button>
                     
                   </div>
                 </div>
@@ -398,16 +485,21 @@ export default function Painel() {
         <Select.Content className="bg-white rounded-xl shadow-2xl border border-gray-200 z-[110]">
           <Select.Viewport className="p-2">
             {opcoesTamanho.map((t) => (
-              <Select.Item key={t} value={t} className="p-3 rounded-lg outline-none cursor-pointer hover:bg-[#f0faf5] focus:bg-[#f0faf5] transition text-sm lg:text-md font-extralight">
-                <Select.ItemText>{t}</Select.ItemText>
+              <Select.Item key={t.id_tam} value={t.tamanho_tam} className="p-3 rounded-lg outline-none cursor-pointer hover:bg-[#f0faf5] focus:bg-[#f0faf5] transition text-sm lg:text-md font-extralight">
+                <Select.ItemText>{t.tamanho_tam}</Select.ItemText>
               </Select.Item>
             ))}
           </Select.Viewport>
         </Select.Content>
       </Select.Portal>
     </Select.Root>
-    <button type="button" onClick={() => { setEnumAtual('tamanho'); setModalEnumAberto(true); }} className="p-3 border border-gray-300 rounded-xl hover:bg-gray-50 cursor-pointer transition">
-      <PlusIcon/>
+    <button type="button" onClick={() => {
+      setEnumAtual('tamanho');
+      setEnumEditandoId(null);
+      setNovoValorEnum("");
+      setModalEnumAberto(true);
+      }} className="p-3 border border-gray-300 rounded-xl hover:bg-gray-50 cursor-pointer transition">
+      <GearIcon/>
     </button>
   </div>
 </div>
@@ -509,10 +601,10 @@ export default function Painel() {
                     >
                       {sacola.nome_sac}
                     </td>
-                      <td className="p-4 text-gray-600">{sacola.tipo_sac}</td>
+                      <td className="p-4">{sacola.tipo_sac}</td>
                       <td className="p-4 text-center">{sacola.quantidademin_sac}</td>
                       <td className="p-4 text-center">R$ {Number(sacola.precounitario_sac).toFixed(2)}</td>
-                      <td className="p-4 text-center font-medium">{sacola.tamanho_sac}</td>
+                      <td className="p-4 text-center">{sacola.tamanho_sac}</td>
                       <td className="p-4 text-center">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${sacola.status_sac === 'Disponível' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                           {sacola.status_sac}
@@ -535,26 +627,188 @@ export default function Painel() {
         <Dialog.Root open={modalEnumAberto} onOpenChange={setModalEnumAberto}>
           <Dialog.Portal>
             <Dialog.Overlay className="bg-black/40 fixed inset-0 z-[120]" />
-            <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm z-[130]">
+            <Dialog.Content aria-describedby={undefined} className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm z-[130]">
+              
+              {/* O Título agora é mais geral, pois gerencia as duas coisas */}
               <Dialog.Title className="text-lg font-extrabold mb-4 text-[#264f41]">
-                Novo {enumAtual === 'tipo' ? 'Material' : 'Tamanho'}
+                Gerenciar {enumAtual === 'tipo' ? 'Material' : 'Tamanho'}
               </Dialog.Title>
-              <form onSubmit={handleAdicionarValorEnum} className="flex flex-col gap-4">
-                <input 
-                  type="text"
-                  placeholder="Ex: Papel Kraft, 20x30..."
-                  className="border border-gray-300 p-3 rounded-xl outline-none focus:border-[#5ab58f]"
-                  value={novoValorEnum}
-                  onChange={(e) => setNovoValorEnum(e.target.value)}
-                  autoFocus
-                />
-                <div className="flex gap-3">
-                  <Dialog.Close asChild>
-                    <button type="button" className="flex-1 p-3 bg-gray-100 rounded-xl font-bold">Cancelar</button>
-                  </Dialog.Close>
-                  <button type="submit" className="flex-1 p-3 bg-[#5ab58f] text-white rounded-xl font-bold">Salvar</button>
-                </div>
-              </form>
+
+              {/* === INÍCIO DAS ABAS === */}
+              <Tabs.Root 
+                defaultValue="novo"
+                onValueChange={(abaClicada) => {
+                  // Limpa a memória ao trocar de aba para não bugar o input
+                  if (abaClicada === "novo") {
+                    setEnumEditandoId(null);
+                    setNovoValorEnum("");
+                  }
+                }}
+              >
+                {/* Botões de Navegação das Abas */}
+                <Tabs.List className="flex border-b border-gray-200 mb-6">
+                  <Tabs.Trigger 
+                    value="novo" 
+                    className="flex-1 p-2 font-semibold text-gray-500 data-[state=active]:text-[#264f41] data-[state=active]:border-b-2 data-[state=active]:border-[#5ab58f] transition outline-none"
+                  >
+                    Adicionar
+                  </Tabs.Trigger>
+                  <Tabs.Trigger 
+                    value="gerenciar" 
+                    className="flex-1 p-2 font-semibold text-gray-500 data-[state=active]:text-[#264f41] data-[state=active]:border-b-2 data-[state=active]:border-[#5ab58f] transition outline-none"
+                  >
+                    Editar
+                  </Tabs.Trigger>
+                </Tabs.List>
+
+                {/* ABA 1: ADICIONAR NOVO (O seu formulário atual vai aqui dentro) */}
+                <Tabs.Content value="novo" className="outline-none">
+                  <form onSubmit={handleAdicionarValorEnum} className="flex flex-col gap-4">
+                    <input 
+                      type="text"
+                      placeholder={enumAtual === 'tipo' ? "Ex: Papel, Plástico..." : "Ex: 20x30, 30x40..."}
+                      className="border border-gray-300 p-3 rounded-xl outline-none focus:border-[#5ab58f]"
+                      value={novoValorEnum}
+                      onChange={(e) => setNovoValorEnum(e.target.value)}
+                      autoFocus
+                    />
+                    <div className="flex gap-3">
+                      <Dialog.Close asChild>
+                        <button type="button" className="flex-1 p-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-bold transition">Cancelar</button>
+                      </Dialog.Close>
+                      <button type="submit" className="flex-1 p-3 bg-[#5ab58f] hover:bg-[#489474] text-white rounded-xl font-bold transition">Salvar</button>
+                    </div>
+                  </form>
+                </Tabs.Content>
+
+                {/* ABA 2: EDITAR / OCULTAR EXISTENTE */}
+                <Tabs.Content value="gerenciar" className="outline-none flex flex-col gap-4">
+                  
+                  {/* O Dropdown para selecionar o item que tem erro */}
+                  <Select.Root 
+                    onValueChange={(nomeSelecionado) => {
+                      if (enumAtual === 'tipo') {
+                        // Busca na lista de materiais usando tipo_tip
+                        const itemEncontrado = opcoesMaterial.find(item => item.tipo_tip === nomeSelecionado);
+                        if (itemEncontrado) {
+                          setEnumEditandoId(itemEncontrado.id_tip); // Salva o id_tip
+                          setNovoValorEnum(itemEncontrado.tipo_tip);
+                        }
+                      } else {
+                        // Busca na lista de tamanhos usando tamanho_tam
+                        const itemEncontrado = opcoesTamanho.find(item => item.tamanho_tam === nomeSelecionado);
+                        if (itemEncontrado) {
+                          setEnumEditandoId(itemEncontrado.id_tam); // Salva o id_tam
+                          setNovoValorEnum(itemEncontrado.tamanho_tam);
+                        }
+                      }
+                    }}
+                  >
+                    <Select.Trigger className="border border-gray-300 p-3 rounded-xl flex justify-between items-center outline-none focus:border-[#5ab58f]">
+                      <Select.Value placeholder="Selecione um item..." />
+                    </Select.Trigger>
+                    
+                    <Select.Portal>
+                      <Select.Content className="bg-white rounded-md shadow-2xl border border-gray-200 z-[140]">
+                        <Select.Viewport>
+                          
+                          {/* Desenhando as opções adaptadas */}
+                          {(enumAtual === 'tipo' ? opcoesMaterial : opcoesTamanho).map((item) => {
+                            // Descobre qual chave usar dependendo do contexto
+                            const itemId = enumAtual === 'tipo' ? item.id_tip : item.id_tam;
+                            const itemNome = enumAtual === 'tipo' ? item.tipo_tip : item.tamanho_tam;
+
+                            return (
+                              <Select.Item key={itemId} value={itemNome} className="p-3 outline-none hover:bg-gray-100 cursor-pointer">
+                                <Select.ItemText>{itemNome}</Select.ItemText>
+                              </Select.Item>
+                            );
+                          })}
+
+                        </Select.Viewport>
+                      </Select.Content>
+                    </Select.Portal>
+                  </Select.Root>
+
+                  {/* A área de edição (Só aparece DEPOIS que o usuário escolhe algo na lista acima) */}
+                  {enumEditandoId && (
+                    <div className="flex flex-col gap-3 mt-2 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                      <label className="font-bold text-sm text-gray-700">Alterar nome:</label>
+                      <input 
+                        type="text"
+                        className="border border-gray-300 p-3 rounded-xl outline-none focus:border-[#5ab58f]"
+                        value={novoValorEnum}
+                        onChange={(e) => setNovoValorEnum(e.target.value)}
+                      />
+                      
+                      <div className="flex gap-3 mt-2">
+                        {/* Botão de Ocultar (precisa da função handleOcultarEnum) */}
+                        {/* === ALERT DIALOG PARA CONFIRMAÇÃO DE EXCLUSÃO === */}
+<AlertDialog.Root>
+  <AlertDialog.Trigger asChild>
+    {/* O botão da lixeira agora apenas abre o alerta, não exclui direto */}
+    <button 
+      type="button" 
+      className="p-3 bg-red-100 hover:bg-red-200 text-red-700 rounded-xl font-outfit font-bold transition flex items-center justify-center"
+    >
+      <TrashIcon className="size-5" />
+    </button>
+  </AlertDialog.Trigger>
+
+  <AlertDialog.Portal>
+    <AlertDialog.Overlay className="bg-black/40 fixed inset-0 z-[150] backdrop-blur-sm" />
+    <AlertDialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-2xl shadow-2xl w-full max-w-xs z-[160] outline-none">
+      
+      <AlertDialog.Title className="text-lg font-extrabold text-[#264f41] mb-2">
+        Tem certeza absoluta?
+      </AlertDialog.Title>
+      
+      {/* Aqui resolvemos aquele aviso de "Description" do console! */}
+      <AlertDialog.Description className="text-gray-600 text-sm mb-6 leading-relaxed">
+        Essa ação é permanente. O {enumAtual === 'tipo' ? 'material' : 'tamanho'} selecionado deixará de estar disponível para novos produtos.
+      </AlertDialog.Description>
+
+      <div className="flex gap-3 justify-end">
+        <AlertDialog.Cancel asChild>
+          <button className="flex-1 p-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold transition outline-none">
+            Cancelar
+          </button>
+        </AlertDialog.Cancel>
+        
+        <AlertDialog.Action asChild>
+          <button 
+            onClick={() => handleOcultarEnum(enumEditandoId)}
+            className="flex-1 p-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition outline-none"
+          >
+            Sim, excluir
+          </button>
+        </AlertDialog.Action>
+      </div>
+
+    </AlertDialog.Content>
+  </AlertDialog.Portal>
+</AlertDialog.Root>
+
+                        {/* Botão de Salvar Alteração (precisa da função handleEditarValorEnum) */}
+                        <button 
+                          type="button" 
+                          onClick={handleEditarValorEnum}
+                          className="flex-1 p-3 bg-[#5ab58f] hover:bg-[#489474] text-white rounded-xl font-bold transition"
+                        >
+                          Salvar Alteração
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                </Tabs.Content>
+              </Tabs.Root>
+              {/* === FIM DAS ABAS === */}
+
+              <Dialog.Close asChild>
+                <button className="absolute top-5 right-5 text-gray-400 hover:text-black font-bold text-lg transition">✕</button>
+              </Dialog.Close>
+
             </Dialog.Content>
           </Dialog.Portal>
         </Dialog.Root>
