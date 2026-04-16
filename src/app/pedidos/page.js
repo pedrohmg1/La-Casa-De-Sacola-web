@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabaseClient";
-import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 import { ShoppingBagIcon, ClockIcon, CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 
@@ -48,7 +47,6 @@ export default function PedidosPage() {
 
   return (
     <div className="min-h-screen bg-[#f4f7f5] flex flex-col">
-      <Navbar />
       
       <main className="flex-1 max-w-5xl mx-auto w-full p-6 lg:p-10">
         <header className="mb-8">
