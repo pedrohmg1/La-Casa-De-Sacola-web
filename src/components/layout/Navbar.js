@@ -92,6 +92,9 @@ export default function Navbar() {
             {cargo === 'administrador' && (
               <Link href="/painel" className="text-sm font-bold text-[#8f0000] hover:text-red-700 transition-colors"> Painel Admin </Link>
             )}
+            {cargo === 'administrador' && (
+              <Link href="/producao" className="text-sm font-bold text-[#8f0000] hover:text-red-700 transition-colors"> Produção </Link>
+            )}
             <Link href="/#contato" className="text-sm font-medium text-[#3a5c4e] hover:text-[#3ca779] transition-colors"> Contato </Link>
             <Link href="/catalogo" className="text-sm font-medium text-[#3a5c4e] hover:text-[#3ca779] transition-colors">
              Produtos Modelos
@@ -178,6 +181,9 @@ export default function Navbar() {
           <Link href="/#sobre" className="text-sm font-medium text-[#3a5c4e] py-2" onClick={() => setMenuOpen(false)}>Quem Somos</Link>
           {cargo === 'administrador' && (
             <Link href="/painel" className="text-sm font-bold text-[#8f0000] py-2" onClick={() => setMenuOpen(false)}>Painel Administrador</Link>
+          )}
+          {cargo === 'administrador' && (
+            <Link href="/producao" className="text-sm font-bold text-[#8f0000] py-2" onClick={() => setMenuOpen(false)}>Produção</Link>
           )}
           <Link href="/#contato" className="text-sm font-medium text-[#3a5c4e] py-2" onClick={() => setMenuOpen(false)}>Contato</Link>
           
