@@ -1,11 +1,19 @@
 "use client"
+
+import Link from "next/link";
 import React, { useState } from "react";
+import RotaAdmin from "../components/admin/rotaAdmin";
+import useVerificaAcessoAdmin from "../hooks/verificaAcesso.js";
+import { useRouter } from 'next/navigation';
 
 export default function Producao() {
+
+  const router = useRouter();
+
     const [pedidos, setPedidos] = useState([
-        { id: 1, tipo: 'Sacola Kraft', quantidade: 400, tamanho: 'Médio', cor: 'Branco', imagem: 'img/img_login.png', preco: 45.00 },
-        { id: 2, tipo: 'Sacola Plástica', quantidade: 200, tamanho: 'Pequeno', cor: 'Preto', imagem: 'img/img_login.png', preco: 30.00 },
-        { id: 3, tipo: 'Sacola Tecido', quantidade: 150, tamanho: 'Grande', cor: 'Colorido', imagem: 'img/img_login.png', preco: 60.00 },
+        { id: "S01", tipo: 'Sacola Kraft', quantidade: 400, tamanho: 'Médio', cor: 'Branco', imagem: 'img/img_login.png', preco: 45.00 },
+        { id: "S12", tipo: 'Sacola Plástica', quantidade: 200, tamanho: 'Pequeno', cor: 'Preto', imagem: 'img/img_login.png', preco: 30.00 },
+        { id: "S23", tipo: 'Sacola Tecido', quantidade: 150, tamanho: 'Grande', cor: 'Colorido', imagem: 'img/img_login.png', preco: 60.00 },
     ]);
 
     const [pedidoSelecionado, setPedidoSelecionado] = useState(null);
@@ -21,20 +29,25 @@ export default function Producao() {
     }
 
     return (
+      <RotaAdmin>
       <>
         <main className="p-5 m-auto bg-gray-100">
           <meta charSet="UTF-8" />
+          <button onClick={() => router.push('/')} className="bg-[#264f41] hover:bg-[#403c37] text-white px-2.5 py-2.5 rounded-xl font-bold transition shadow-md flex items-left gap-2 text-md lg:text-md w-max mb-5">
+          ← Voltar
+        </button>
+
           <title>Produção</title>
 
           <div className="mb-4">
-            <h1 className="text-xl font-extrabold">Painel Produção</h1>
-            <h2>Visualize os detalhes dos pedidos</h2>
+            <h1 className="text-lg lg:text-xl font-extrabold text-[#264f41]">Painel Produção</h1>
+            <h2 className="text-md lg:text-lg text-gray-600">Visualize os detalhes dos pedidos</h2>
           </div>
 
           <div className="overflow-x-auto border-2 rounded-t-xl">
             <table className="w-full text-left">
               <thead className="border-2 border-zinc-500">
-                <tr className="bg-zinc-800 text-white">
+                <tr className="bg-[#264f41] text-white">
                   <th className="p-3">ID Pedido</th>
                   <th className="p-3 text-center">Quantidade</th>
                   <th className="p-3 text-center">Preço Total (R$)</th>
@@ -43,8 +56,8 @@ export default function Producao() {
               </thead>
               <tbody className="bg-white border-gray-300">
                 {pedidos.map((pedido) => (
-                  <tr key={pedido.id} className="border-2 border-gray-200 hover:bg-gray-200 hover:border-gray-500 transition">
-                    <td className="p-3 font-semibold text-gray-800">{pedido.id}</td>
+                  <tr key={pedido.id} className="hover:bg-[#f0faf5] transition">
+                    <td className="p-4 font-bold text-[#264f41] max-w-[250px] truncate">{pedido.id}</td>
                     <td className="p-3 text-center">{pedido.quantidade}</td>
                     <td className="p-3 text-center">R${pedido.preco.toFixed(2)}</td>
                     <td className="p-3 text-center">
@@ -114,5 +127,6 @@ export default function Producao() {
           </div>
         )}
       </>
+      </RotaAdmin>
     );
 }

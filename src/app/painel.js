@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import useLoginHook from "../hooks/loginHook.js" // precisa trocar pra um que valide se o usuário já está logado (ou então adicionar essa logica dentro do loginHook)
 import RotaAdmin from "../components/admin/rotaAdmin";
@@ -23,6 +24,9 @@ import {
 } from "@radix-ui/react-icons";
 
 export default function Painel() {
+
+  const router = useRouter();
+
     useEffect(() => {
         // Criamos a função que vai até a nuvem
         const carregarSacolas = async () => {
@@ -321,6 +325,10 @@ export default function Painel() {
     <RotaAdmin>
       <main className="p-5 m-auto bg-gray-100 h-screen flex flex-col">
         <meta charSet="UTF-8" />
+        <button onClick={() => router.push('/')} className="bg-[#264f41] hover:bg-[#403c37] text-white px-2.5 py-2.5 rounded-xl font-bold transition shadow-md flex items-left gap-2 text-md lg:text-md w-max mb-5">
+          ← Voltar
+        </button>
+
         <title>Painel Administrador</title>
 
         <div className="mb-4">
@@ -362,7 +370,7 @@ export default function Painel() {
 
             <Dialog.Trigger asChild>
               <button 
-                className="bg-[#292622] hover:bg-[#403c37] text-white px-5 py-2.5 rounded-xl font-bold transition shadow-md flex items-center gap-2 text-sm lg:text-md"
+                className="bg-[#264f41] hover:bg-[#403c37] text-white px-5 py-2.5 rounded-xl font-bold transition shadow-md flex items-center gap-2 text-sm lg:text-md"
                 onClick={() => {
                   setSacolaEditandoId(null);
                   handleAbrirNovaSacola();
@@ -569,7 +577,7 @@ export default function Painel() {
         <div className="flex-1 min-h-0 bg-white rounded-xl shadow-sm border border-[#e4f4ed] overflow-hidden">
           <div className="max-h-full overflow-auto custom-scrollbar">
             <table className="w-full text-left">
-              <thead className="sticky top-0 z-10 bg-[#292622] text-white">
+              <thead className="sticky top-0 z-10 bg-[#264f41] text-white">
                 <tr>
                   <th className="p-4 font-semibold text-sm">Nome</th>
                   <th className="p-4 font-semibold text-sm">Material</th>

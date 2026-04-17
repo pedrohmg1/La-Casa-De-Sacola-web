@@ -8,7 +8,7 @@ export default function NavbarWrapper() {
   
   // Se quiser adicionar ou remover a navbar de uma página
   //  basta adicionar aqui ou remover da lista.
-  const rotasSemNavbar = ['/login', '/cadastro', '/painel'];
+  const rotasSemNavbar = ['/login', '/cadastro', '/painel', '/producao'];
   const exibirNavbar = !rotasSemNavbar.includes(pathname);
 
   if (!exibirNavbar) return null;
