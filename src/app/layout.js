@@ -14,6 +14,8 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Quicksand:wght@500;600;700;800&display=swap"
           rel="stylesheet"
         />
+
+        <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico" />
       </head>
       <body style={{ fontFamily: "'Manrope', sans-serif" }}>
         <NavbarWrapper />
