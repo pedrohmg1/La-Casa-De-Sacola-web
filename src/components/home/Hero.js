@@ -1,5 +1,8 @@
 "use client";
 import Link from "next/link";
+import { 
+  ArrowDownIcon
+} from "@radix-ui/react-icons";
 
 export default function Hero() {
   return (
@@ -51,9 +54,7 @@ export default function Hero() {
                 className="inline-flex items-center justify-center gap-2 border border-[#f4f7f5]/40 text-[#f4f7f5] hover:bg-[#f4f7f5]/10 font-semibold text-base px-8 py-4 rounded-2xl transition-all"
               >
                 Ver Modelos
-                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
+                <ArrowDownIcon className="size-6 animate-bounce"></ArrowDownIcon>
               </Link>
             </div>
           </div>
