@@ -1,5 +1,5 @@
 import './globals.css';
-import NavbarWrapper from '../components/layout/NavbarWrapper';
+import Navbar from '../components/layout/Navbar';
 
 export const metadata = {
   title: 'La Casa de Sacola — Sacolas Personalizadas',
@@ -18,7 +18,7 @@ export default function RootLayout({ children }) {
         <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico" />
       </head>
       <body style={{ fontFamily: "'Manrope', sans-serif" }} className='custom-scrollbar'>
-        <NavbarWrapper />
+        <Navbar/>
         {children}
       </body>
     </html>
