@@ -1,15 +1,32 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { supabase } from "../../lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import { 
+  PlusIcon, 
+} from "@radix-ui/react-icons";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [cargo, setCargo] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const handleClickFora = (e) => {
+      if (dropdownOpen && dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false)
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickFora);
+    return () => {
+      document.removeEventListener("mousedown", handleClickFora)
+    };
+  }, [dropdownOpen])
 
   useEffect(() => {
     const getDadosIniciais = async () => {
@@ -117,14 +134,22 @@ export default function Navbar() {
                   Entrar
                 </Link>
                 <Link
+                  href="/cadastro"
+                  className="text-sm font-semibold text-white bg-[#5ab58f] rounded-xl px-4 py-2 hover:bg-[#2e8f65] transition-colors shadow-sm"
+                >
+                  Cadastrar-se
+                </Link>
+                {/* Troquei o "fazer pedido" por "cadastrar-se"   -Mateus
+                <Link
                   href="/login"
                   className="text-sm font-semibold text-white bg-[#5ab58f] rounded-xl px-4 py-2 hover:bg-[#2e8f65] transition-colors shadow-sm"
                 >
                   Fazer Pedido
                 </Link>
+                */}
               </>
             ) : (
-              <div className="relative">
+              <div className="relative" ref={dropdownRef}>
                 <button 
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   className="flex items-center gap-2 text-sm font-semibold text-[#264f41] bg-white border border-[#e4f4ed] rounded-xl px-4 py-2 hover:bg-[#f0faf5] transition-all"
@@ -142,25 +167,36 @@ export default function Navbar() {
                       <span className="block text-xs font-medium text-[#6e8679] mt-0.5">Dados, pedidos e endereços</span>
                     </Link>
                     <div className="h-px bg-[#e4f4ed] mx-4" />
-                    {cargo !== 'administrador' && (
-                      <Link href="/enderecos" className="block px-4 py-2 text-sm text-[#3a5c4e] hover:bg-[#f0faf5]" onClick={() => setDropdownOpen(false)}>
-                        Meus Endereços
-                      </Link>
-                    )}
-                    {cargo !== 'administrador' && (
-                      <Link href="/pedidos" className="block px-4 py-2 text-sm text-[#3a5c4e] hover:bg-[#f0faf5]" onClick={() => setDropdownOpen(false)}>
-                       Meus Pedidos
-                      </Link>
-                    )}
+                      {cargo !== 'administrador' && (
+                        <>
+                          <Link href="/enderecos" className="block px-4 py-2 text-sm text-[#3a5c4e] hover:bg-[#f0faf5]" onClick={() => setDropdownOpen(false)}>
+                            Meus Endereços
+                          </Link>
+
+                          <Link href="/pedidos" className="block px-4 py-2 text-sm text-[#3a5c4e] hover:bg-[#f0faf5]" onClick={() => setDropdownOpen(false)}>
+                            Meus Pedidos
+                          </Link>
+
+                          <hr className="my-1 border-[#e4f4ed]" />
+
+                          <Link href="/perfil" className="block px-4 py-3 text-sm font-bold text-[#264f41] hover:bg-[#f7f4eb]" onClick={() => setDropdownOpen(false)}>
+                          <div className="flex flex-row items-center">
+                            <PlusIcon className="size-4 mr-1"></PlusIcon> Fazer Pedido
+                          </div>
+                            <span className="block text-xs font-medium text-[#6e8679] mt-0.5">Dados, pedidos e endereços</span>
+                          </Link>
+                        </>
+                      )}
                     {cargo === 'administrador' && (
+                      <>
                       <Link href="/painel" className="block px-4 py-2 text-sm text-[#8f0000] hover:text-red-700 transition-colors" onClick={() => setDropdownOpen(false)}>
                         Painel Administrador
                       </Link>
-                    )}
-                    {cargo === 'administrador' && (
+
                       <Link href="/producao" className="block px-4 py-2 text-sm text-[#8f0000] hover:text-red-700 transition-colors" onClick={() => setDropdownOpen(false)}>
                         Sacolas em Produção
                       </Link>
+                      </>
                     )}
                     <hr className="my-1 border-[#e4f4ed]" />
                     <button 
@@ -173,6 +209,8 @@ export default function Navbar() {
                 )}
               </div>
             )}
+
+
           </div>
 
           {/* Mobile menu button */}
@@ -211,7 +249,10 @@ export default function Navbar() {
             {!user ? (
               <div className="flex gap-3">
                 <Link href="/login" className="flex-1 text-center text-sm font-semibold text-[#8f0000] border border-[#8f0000] rounded-xl px-4 py-2" onClick={() => setMenuOpen(false)}>Entrar</Link>
+                <Link href="/cadastro" className="flex-1 text-center text-sm font-semibold text-white bg-[#5ab58f] rounded-xl px-4 py-2" onClick={() => setMenuOpen(false)}>Cadastrar-se</Link>
+                {/* Troquei o "fazer pedido" por "cadastrar-se"   -Mateus
                 <Link href="/login" className="flex-1 text-center text-sm font-semibold text-white bg-[#5ab58f] rounded-xl px-4 py-2" onClick={() => setMenuOpen(false)}>Fazer Pedido</Link>
+                */}
               </div>
             ) : (
               <>

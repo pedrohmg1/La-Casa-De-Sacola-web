@@ -5,7 +5,7 @@ import { supabase } from "../../lib/supabaseClient";
 import Footer from "../../components/layout/Footer";
 import toast from "react-hot-toast";
 import * as Dialog from '@radix-ui/react-dialog';
-// import { MapPinIcon, PlusIcon, TrashIcon, XMarkIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
+import { MapPinIcon, PlusIcon, TrashIcon, XMarkIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 
 export default function EnderecosPage() {
   const [enderecos, setEnderecos] = useState([]);

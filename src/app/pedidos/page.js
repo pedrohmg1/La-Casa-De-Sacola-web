@@ -11,9 +11,10 @@ export default function PedidosPage() {
 
   useEffect(() => {
     const fetchPedidos = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
       
-      if (!user) {
+      if (authError || !user) {
         window.location.href = "/login";
         return;
       }
@@ -22,13 +23,17 @@ export default function PedidosPage() {
       const { data, error } = await supabase
         .from("pedido")
         .select("*")
-        .eq("uuid_usu", user.id)
-        .order("created_at", { ascending: false });
+        .eq("usu_uuid", user.id)
+        .order("data", { ascending: false });
 
-      if (!error) {
+      if (error) throw error;
+
         setPedidos(data || []);
+      } catch (error) {
+        console.error("Erro ao buscar pedidos:", error);
+      } finally {
+        setCarregando(false);
       }
-      setCarregando(false);
     };
 
     fetchPedidos();
@@ -71,9 +76,9 @@ export default function PedidosPage() {
                     <ShoppingBagIcon className="w-8 h-8 text-[#3ca779]" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-gray-400 uppercase">Pedido #{pedido.id_ped}</p>
-                    <p className="font-bold text-[#264f41] text-lg">
-                      {new Date(pedido.created_at).toLocaleDateString('pt-BR')}
+                    <p className="text-xs font-bold text-gray-400 uppercase">Identificador Único do Pedido: #{pedido.id_ped}</p>
+                    <p className="font-bold text-[#264f41] text-lg">Pedido feito em: {" "}
+                      {new Date(pedido.data).toLocaleDateString('pt-BR')}
                     </p>
                     <p className="text-sm text-gray-500">Valor Total: <span className="font-bold text-[#3ca779]">R$ {Number(pedido.total_ped).toFixed(2)}</span></p>
                   </div>
