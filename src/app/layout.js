@@ -15,7 +15,7 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
 
-        <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico" />
+        <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico" />
       </head>
       <body style={{ fontFamily: "'Manrope', sans-serif" }}>
         <NavbarWrapper />

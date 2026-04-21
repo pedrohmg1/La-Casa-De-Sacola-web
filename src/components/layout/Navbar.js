@@ -70,17 +70,24 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#292622] to-[#8f0000] flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+            <img 
+              src="/img/logoSimples.png" 
+              alt="Logo" 
+              className="w-7 h-7 object-contain z-[999]" 
+            />
+              {/* Comentei o SVG da sacola pra testar com a imagem no lugar dele, mas pode trazer de volta se acharem melhor   -Mateus
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <line x1="3" y1="6" x2="21" y2="6" stroke="white" strokeWidth="2" strokeLinecap="round"/>
                 <path d="M16 10a4 4 0 01-8 0" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
+              */}
             </div>
             <div className="flex flex-col leading-none">
-              <span className="font-extrabold text-[#264f41] text-lg tracking-tight" style={{ fontFamily: "'Quicksand', sans-serif" }}>
+              <span className="font-extrabold text-[#292622] text-lg tracking-tight" style={{ fontFamily: "'Quicksand', sans-serif" }}>
                 La Casa
               </span>
-              <span className="text-[#8f0000] text-xs font-semibold tracking-widest uppercase">de Sacola</span>
+              <span className="text-[#8f0000] text-xs font-bold tracking-widest uppercase -mt-1">de Sacola</span>
             </div>
           </Link>
 
@@ -89,12 +96,6 @@ export default function Navbar() {
             <Link href="/#categorias" className="text-sm font-medium text-[#3a5c4e] hover:text-[#3ca779] transition-colors"> Sacolas </Link>
             <Link href="/#sobre" className="text-sm font-medium text-[#3a5c4e] hover:text-[#3ca779] transition-colors"> Quem Somos </Link>
             <Link href="/#como-funciona" className="text-sm font-medium text-[#3a5c4e] hover:text-[#3ca779] transition-colors"> Como Funciona </Link>
-            {cargo === 'administrador' && (
-              <Link href="/painel" className="text-sm font-bold text-[#8f0000] hover:text-red-700 transition-colors"> Painel Admin </Link>
-            )}
-            {cargo === 'administrador' && (
-              <Link href="/producao" className="text-sm font-bold text-[#8f0000] hover:text-red-700 transition-colors"> Produção </Link>
-            )}
             <Link href="/#contato" className="text-sm font-medium text-[#3a5c4e] hover:text-[#3ca779] transition-colors"> Contato </Link>
             <Link href="/catalogo" className="text-sm font-medium text-[#3a5c4e] hover:text-[#3ca779] transition-colors">
              Produtos Modelos
@@ -136,12 +137,26 @@ export default function Navbar() {
                       <span className="block text-xs font-medium text-[#6e8679] mt-0.5">Dados, pedidos e endereços</span>
                     </Link>
                     <div className="h-px bg-[#e4f4ed] mx-4" />
-                    <Link href="/enderecos" className="block px-4 py-2 text-sm text-[#3a5c4e] hover:bg-[#f0faf5]" onClick={() => setDropdownOpen(false)}>
-                      Meus Endereços
-                    </Link>
-                    <Link href="/pedidos" className="block px-4 py-2 text-sm text-[#3a5c4e] hover:bg-[#f0faf5]" onClick={() => setDropdownOpen(false)}>
-                      Meus Pedidos
-                    </Link>
+                    {cargo !== 'administrador' && (
+                      <Link href="/enderecos" className="block px-4 py-2 text-sm text-[#3a5c4e] hover:bg-[#f0faf5]" onClick={() => setDropdownOpen(false)}>
+                        Meus Endereços
+                      </Link>
+                    )}
+                    {cargo !== 'administrador' && (
+                      <Link href="/pedidos" className="block px-4 py-2 text-sm text-[#3a5c4e] hover:bg-[#f0faf5]" onClick={() => setDropdownOpen(false)}>
+                       Meus Pedidos
+                      </Link>
+                    )}
+                    {cargo === 'administrador' && (
+                      <Link href="/painel" className="block px-4 py-2 text-sm text-[#8f0000] hover:text-red-700 transition-colors" onClick={() => setDropdownOpen(false)}>
+                        Painel Administrador
+                      </Link>
+                    )}
+                    {cargo === 'administrador' && (
+                      <Link href="/producao" className="block px-4 py-2 text-sm text-[#8f0000] hover:text-red-700 transition-colors" onClick={() => setDropdownOpen(false)}>
+                        Sacolas em Produção
+                      </Link>
+                    )}
                     <hr className="my-1 border-[#e4f4ed]" />
                     <button 
                       onClick={handleLogout}
