@@ -10,9 +10,14 @@ import AuthTextLink from "../components/auth/AuthTextLink";
 import styles from "../components/auth/auth.module.css";
 import { Toaster } from "react-hot-toast";
 import useLoginHook from "../hooks/loginHook.js"
+import { useRouter } from "next/navigation";
+
+
 
 export default function Login() {
   const { formData, setFormData, loading, handleSignIn } = useLoginHook();
+  const router = useRouter();
+
   return (
     <>
       <Toaster position="top-right" />
@@ -26,6 +31,17 @@ export default function Login() {
 
       <AuthBackground>
         <AuthCard>
+
+          <button 
+              onClick={() => router.push('/')} 
+              className={`${styles.reveal} ${styles.d1} flex items-center gap-2 text-sm font-medium text-[#6b9e8a] hover:text-[#3ca779] transition-colors -ml-2 -mt-2 mb-2`}
+              >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 18l-6-6 6-6" />
+             </svg>
+                Voltar
+          </button>
+          
           <h1 className={`${styles.reveal} ${styles.d1} ${styles.title} font-extrabold`}>Login</h1>
           <p className={`${styles.reveal} ${styles.d2} ${styles.titleSub} mt-2`}>
             Entre e transforme suas sacolas em parte da sua marca

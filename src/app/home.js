@@ -5,6 +5,7 @@ import HowItWorks from "../components/home/HowItWorks";
 import AboutSection from "../components/home/AboutSection";
 import Reviews from "../components/home/Reviews";
 import CTABanner from "../components/home/CTABanner";
+import Navbar from '../components/layout/Navbar';
 import Footer from "../components/layout/Footer";
 import MockupGenerator from "../components/home/MockupGenerator";
 
@@ -19,6 +20,7 @@ export default function HomePage() {
         rel="stylesheet"
       />
       <div className="min-h-screen bg-white">
+        <Navbar />
         <Hero />
         <Benefits />
         <BagCategories />
