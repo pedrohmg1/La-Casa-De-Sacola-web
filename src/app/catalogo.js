@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { ChevronLeftIcon, ChevronRightIcon, MixerHorizontalIcon, Cross2Icon } from "@radix-ui/react-icons";
+import Navbar from '../components/layout/Navbar';
 
 export default function ProdutosModelos() {
   const [produtos, setProdutos] = useState([]);
@@ -108,7 +109,7 @@ const carregarProdutos = async () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-    
+      <Navbar />
 
       <main className="flex-grow container mx-auto px-4 py-8 mt-20">
         {/* HEADER */}
