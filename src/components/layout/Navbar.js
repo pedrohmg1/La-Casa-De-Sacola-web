@@ -8,13 +8,15 @@ import {
   UpdateIcon
 } from "@radix-ui/react-icons";
 import toast,{ Toaster } from "react-hot-toast";
+import useNavbarAuth from "../../hooks/loginAuthNavbar"; 
+import ToastErroAuth, { opcoesErroAuth } from "./loginToastNavbar";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
-  const [cargo, setCargo] = useState(null);
+  //const [user, setUser] = useState(null);
+  //const [cargo, setCargo] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [navbarLoading, setNavbarLoading] = useState (true);
+  //const [navbarLoading, setNavbarLoading] = useState (true);
   const dropdownRef = useRef(null);
   const router = useRouter();
 
@@ -31,101 +33,12 @@ export default function Navbar() {
     };
   }, [dropdownOpen])
 
+  const { user, cargo, navbarLoading, erro } = useNavbarAuth();
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      toast.error(
-        (t) => (
-          <span className="flex flex-col gap-2">
-            <span className="font-bold">Opa! Tivemos um problema ao carregar sua conta.</span>
-            <span className="text-sm font-normal">
-              Verifique sua conexão e tente novamente.
-            </span>
-              <button
-                onClick={() => window.location.reload()}
-                className="bg-[#5ab58f] hover:bg-[#2e8f65] text-white p-2.5 rounded-xl font-bold transition shadow-lg flex flex-row items-center justify-center gap-2"
-              >
-                <UpdateIcon/>
-                Recarregar
-              </button>
-          </span>
-        ),
-        { duration: Infinity, id: "erro-auth" }
-      );
-      setNavbarLoading(false);
-    }, 5000);
-  
-/*     const getDadosIniciais = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      
-      if (user) {
-        const { data: perfil } = await supabase
-          .from('usuario')
-          .select('cargo')
-          .eq('uuid_usu', user.id)
-          .single();
-        
-        setCargo(perfil?.cargo || null);
-      }
-    }; */
-
-    //getDadosIniciais();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      clearTimeout(timeout);
-    
-      try {
-        const currentUser = session?.user ?? null;
-        setUser(currentUser);
-    
-        if (currentUser) {
-          const { data: perfil, error: perfilError } = await supabase
-            .from('usuario')
-            .select('cargo')
-            .eq('uuid_usu', currentUser.id)
-            .single();
-    
-          if (perfilError) {
-          console.error('Erro ao buscar cargo:', perfilError)
-          toast.error(
-            (t) => (
-              <span className="flex flex-col gap-2">
-                <span className="font-bold">Opa! Tivemos um problema ao carregar sua conta.</span>
-                <span className="text-sm font-normal">
-                  Verifique sua conexão e tente novamente.
-                </span>
-                  <button
-                    onClick={() => window.location.reload()}
-                    className="bg-[#5ab58f] hover:bg-[#2e8f65] text-white p-2.5 rounded-xl font-bold transition shadow-lg flex flex-row items-center justify-center gap-2"
-                  >
-                    <UpdateIcon/>
-                    Recarregar
-                  </button>
-              </span>
-            ),
-            { duration: Infinity, id: "erro-auth" }
-          );
-          
-          return;
-      }
-
-      setCargo(perfil?.cargo ?? null);
-    } else {
-      setCargo(null);
+    if (erro) {
+      toast.error(ToastErroAuth, opcoesErroAuth);
     }
-  } catch (e) {
-    console.error('Erro inesperado na verificação:', e);
-    toast.error(toastErroAuth, opcoesErroAuth);
-  } finally {
-    setNavbarLoading(false); // ← sempre executa, independente do que aconteceu acima
-  }
-});
-
-    return () => {
-      clearTimeout(timeout);
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
+  }, [erro]);
 
   const handleLogout = async () => {
     try {
