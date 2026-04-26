@@ -67,3 +67,57 @@ export function adicionarCorLocal({
     coresDoMaterialAtualizadas: [...baseAtual, { nome: nomeNormalizado, hex: novaCorHex }],
   };
 }
+
+export function removerCorLocal({
+  nomeMaterial,
+  cor,
+  coresPrincipais,
+  coresPorMaterial,
+  coresSelecionadasPorMaterial,
+}) {
+  const materialNormalizado = normalizarMaterial(nomeMaterial);
+  const coresParaFiltrar = (lista) =>
+    lista.filter((item) => !(item.nome === cor.nome && item.hex === cor.hex));
+
+  const removerDasSelecoes = (selecoes) => {
+    const selecoesAtualizadas = {};
+
+    Object.entries(selecoes).forEach(([chave, lista]) => {
+      selecoesAtualizadas[chave] = coresParaFiltrar(lista);
+    });
+
+    return selecoesAtualizadas;
+  };
+
+  if (!materialNormalizado) {
+    const coresPrincipaisAtualizadas = coresParaFiltrar(coresPrincipais);
+
+    return {
+      ok: true,
+      tipo: "principal",
+      coresPrincipaisAtualizadas,
+      coresSelecionadasPorMaterialAtualizadas: removerDasSelecoes(coresSelecionadasPorMaterial),
+    };
+  }
+
+  const temListaCustomizada = Array.isArray(coresPorMaterial[materialNormalizado]);
+  const coresDoMaterialAtuais = temListaCustomizada ? coresPorMaterial[materialNormalizado] : [];
+
+  // Se o material ainda usa fallback das cores principais, a exclusao deve afetar a lista principal.
+  if (!temListaCustomizada) {
+    return {
+      ok: true,
+      tipo: "principal",
+      coresPrincipaisAtualizadas: coresParaFiltrar(coresPrincipais),
+      coresSelecionadasPorMaterialAtualizadas: removerDasSelecoes(coresSelecionadasPorMaterial),
+    };
+  }
+
+  return {
+    ok: true,
+    tipo: "material",
+    materialNormalizado,
+    coresDoMaterialAtualizadas: coresParaFiltrar(coresDoMaterialAtuais),
+    coresSelecionadasPorMaterialAtualizadas: removerDasSelecoes(coresSelecionadasPorMaterial),
+  };
+}

@@ -6,10 +6,12 @@ import useLoginHook from "../hooks/loginHook.js" // precisa trocar pra um que va
 import RotaAdmin from "../components/admin/rotaAdmin";
 import CoresMaterialSection from "../components/admin/CoresMaterialSection";
 import CoresMaterialPreview from "../components/admin/CoresMaterialPreview";
+import EditarCoresDialog from "../components/admin/EditarCoresDialog";
 import {
   CORES_PRINCIPAIS_PADRAO,
   obterCoresDoMaterial,
   adicionarCorLocal,
+  removerCorLocal,
 } from "../components/admin/coresMaterialLogic";
 import { useState, useEffect } from "react";
 import * as Dialog from '@radix-ui/react-dialog';
@@ -93,7 +95,7 @@ export default function Painel() {
       const [coresSelecionadasPorMaterial, setCoresSelecionadasPorMaterial] = useState({});
       const [novaCorNome, setNovaCorNome] = useState("");
       const [novaCorHex, setNovaCorHex] = useState("#000000");
-      const [mostrarFormularioCor, setMostrarFormularioCor] = useState(false);
+      const [modalEditarCoresAberto, setModalEditarCoresAberto] = useState(false);
 
       const handleAdicionarCorMaterialLocal = (nomeMaterial) => {
         const resultado = adicionarCorLocal({
@@ -122,7 +124,6 @@ export default function Painel() {
 
         setNovaCorNome("");
         setNovaCorHex("#000000");
-        setMostrarFormularioCor(false);
       };
 
       const obterChaveSelecaoCor = (nomeMaterial) => {
@@ -160,8 +161,40 @@ export default function Painel() {
         }));
       };
 
+
+      const handleExcluirCorLocal = (nomeMaterial, cor) => {
+        const confirmado = window.confirm(`Tem certeza que deseja excluir a cor ${cor.nome}?`);
+
+        if (!confirmado) {
+          return;
+        }
+
+        const resultado = removerCorLocal({
+          nomeMaterial,
+          cor,
+          coresPrincipais,
+          coresPorMaterial,
+          coresSelecionadasPorMaterial,
+        });
+
+        if (!resultado.ok) {
+          return;
+        }
+
+        setCoresSelecionadasPorMaterial(resultado.coresSelecionadasPorMaterialAtualizadas);
+
+        if (resultado.tipo === "principal") {
+          setCoresPrincipais(resultado.coresPrincipaisAtualizadas);
+        }
+
+        if (resultado.tipo === "material") {
+          setCoresPorMaterial((anterior) => ({
+            ...anterior,
+            [resultado.materialNormalizado]: resultado.coresDoMaterialAtualizadas,
+          }));
+        }
+      };
       const resetFormularioCor = () => {
-        setMostrarFormularioCor(false);
         setNovaCorNome("");
         setNovaCorHex("#000000");
       };
@@ -782,20 +815,9 @@ export default function Painel() {
 
                     <CoresMaterialSection
                       show={enumAtual === 'tipo'}
-                      nomesCores={obterCoresDoMaterial({
-                        nomeMaterial: novoValorEnum,
-                        coresPorMaterial,
-                        coresPrincipais,
-                      })}
+                      nomesCores={coresPrincipais}
                       coresSelecionadas={obterCoresSelecionadasDoMaterial(novoValorEnum)}
-                      mostrarFormularioCor={mostrarFormularioCor}
-                      novaCorNome={novaCorNome}
-                      novaCorHex={novaCorHex}
-                      onAbrirFormulario={() => setMostrarFormularioCor(true)}
-                      onCancelarFormulario={resetFormularioCor}
-                      onNomeChange={setNovaCorNome}
-                      onHexChange={setNovaCorHex}
-                      onSalvarCor={() => handleAdicionarCorMaterialLocal(novoValorEnum)}
+                      onAbrirFormulario={() => setModalEditarCoresAberto(true)}
                       onToggleCor={(cor) => handleToggleSelecaoCor(novoValorEnum, cor)}
                     />
 
@@ -870,20 +892,9 @@ export default function Painel() {
 
                       <CoresMaterialSection
                         show={enumAtual === 'tipo'}
-                        nomesCores={obterCoresDoMaterial({
-                          nomeMaterial: novoValorEnum,
-                          coresPorMaterial,
-                          coresPrincipais,
-                        })}
+                        nomesCores={coresPrincipais}
                         coresSelecionadas={obterCoresSelecionadasDoMaterial(novoValorEnum)}
-                        mostrarFormularioCor={mostrarFormularioCor}
-                        novaCorNome={novaCorNome}
-                        novaCorHex={novaCorHex}
-                        onAbrirFormulario={() => setMostrarFormularioCor(true)}
-                        onCancelarFormulario={resetFormularioCor}
-                        onNomeChange={setNovaCorNome}
-                        onHexChange={setNovaCorHex}
-                        onSalvarCor={() => handleAdicionarCorMaterialLocal(novoValorEnum)}
+                        onAbrirFormulario={() => setModalEditarCoresAberto(true)}
                         onToggleCor={(cor) => handleToggleSelecaoCor(novoValorEnum, cor)}
                       />
                       
@@ -958,6 +969,21 @@ export default function Painel() {
             </Dialog.Content>
           </Dialog.Portal>
         </Dialog.Root>
+
+        <EditarCoresDialog
+          open={modalEditarCoresAberto}
+          onOpenChange={(aberto) => {
+            setModalEditarCoresAberto(aberto);
+            if (!aberto) resetFormularioCor();
+          }}
+          novaCorNome={novaCorNome}
+          novaCorHex={novaCorHex}
+          onNomeChange={setNovaCorNome}
+          onHexChange={setNovaCorHex}
+          onSalvarCor={() => handleAdicionarCorMaterialLocal("")}
+          onExcluirCor={(cor) => handleExcluirCorLocal("", cor)}
+          cores={coresPrincipais}
+        />
       </main>
     </RotaAdmin>
   );
