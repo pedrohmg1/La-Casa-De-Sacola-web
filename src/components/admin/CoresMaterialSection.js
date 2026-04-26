@@ -3,6 +3,7 @@
 export default function CoresMaterialSection({
   show,
   nomesCores,
+  coresSelecionadas,
   mostrarFormularioCor,
   novaCorNome,
   novaCorHex,
@@ -11,6 +12,7 @@ export default function CoresMaterialSection({
   onNomeChange,
   onHexChange,
   onSalvarCor,
+  onToggleCor,
 }) {
   if (!show) {
     return null;
@@ -22,14 +24,30 @@ export default function CoresMaterialSection({
 
       <div className="max-h-40 overflow-auto custom-scrollbar border border-gray-200 rounded-lg bg-white divide-y divide-gray-100">
         {nomesCores.map((cor) => (
-          <div key={`${cor.nome}-${cor.hex}`} className="flex items-center gap-2 p-2">
+          <button
+            key={`${cor.nome}-${cor.hex}`}
+            type="button"
+            onClick={() => onToggleCor(cor)}
+            className={`w-full flex items-center gap-2 p-2 text-left transition ${
+              coresSelecionadas.some((selecionada) => selecionada.nome === cor.nome && selecionada.hex === cor.hex)
+                ? "bg-[#f0faf5]"
+                : "hover:bg-gray-50"
+            }`}
+          >
             <span
-              className="w-4 h-4 rounded-sm border border-gray-300 shrink-0"
+              className={`w-4 h-4 rounded-sm border shrink-0 ${
+                coresSelecionadas.some((selecionada) => selecionada.nome === cor.nome && selecionada.hex === cor.hex)
+                  ? "border-[#5ab58f] ring-2 ring-[#c8e3d5]"
+                  : "border-gray-300"
+              }`}
               style={{ backgroundColor: cor.hex }}
               aria-hidden
             />
-            <span className="text-sm text-gray-700">{cor.nome}</span>
-          </div>
+            <span className="text-sm text-gray-700 font-medium">{cor.nome}</span>
+            {coresSelecionadas.some((selecionada) => selecionada.nome === cor.nome && selecionada.hex === cor.hex) && (
+              <span className="ml-auto text-xs font-bold text-[#5ab58f] uppercase">Selecionada</span>
+            )}
+          </button>
         ))}
       </div>
 

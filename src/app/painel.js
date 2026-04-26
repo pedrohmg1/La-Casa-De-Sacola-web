@@ -5,6 +5,7 @@ import Link from "next/link";
 import useLoginHook from "../hooks/loginHook.js" // precisa trocar pra um que valide se o usuário já está logado (ou então adicionar essa logica dentro do loginHook)
 import RotaAdmin from "../components/admin/rotaAdmin";
 import CoresMaterialSection from "../components/admin/CoresMaterialSection";
+import CoresMaterialPreview from "../components/admin/CoresMaterialPreview";
 import {
   CORES_PRINCIPAIS_PADRAO,
   obterCoresDoMaterial,
@@ -89,6 +90,7 @@ export default function Painel() {
 
       const [coresPorMaterial, setCoresPorMaterial] = useState({});
       const [coresPrincipais, setCoresPrincipais] = useState(CORES_PRINCIPAIS_PADRAO);
+      const [coresSelecionadasPorMaterial, setCoresSelecionadasPorMaterial] = useState({});
       const [novaCorNome, setNovaCorNome] = useState("");
       const [novaCorHex, setNovaCorHex] = useState("#000000");
       const [mostrarFormularioCor, setMostrarFormularioCor] = useState(false);
@@ -121,6 +123,41 @@ export default function Painel() {
         setNovaCorNome("");
         setNovaCorHex("#000000");
         setMostrarFormularioCor(false);
+      };
+
+      const obterChaveSelecaoCor = (nomeMaterial) => {
+        const chave = (nomeMaterial || "").trim().toLowerCase();
+        return chave || "__principal__";
+      };
+
+      const obterCoresSelecionadasDoMaterial = (nomeMaterial) => {
+        const chave = obterChaveSelecaoCor(nomeMaterial);
+        return coresSelecionadasPorMaterial[chave] || [];
+      };
+
+      const obterCoresDisponiveisParaNovaSacola = () => {
+        if (!novaSacola.tipo_sac) {
+          return [];
+        }
+
+        return obterCoresSelecionadasDoMaterial(novaSacola.tipo_sac);
+      };
+
+      const handleToggleSelecaoCor = (nomeMaterial, cor) => {
+        const chave = obterChaveSelecaoCor(nomeMaterial);
+        const coresAtuais = coresSelecionadasPorMaterial[chave] || [];
+        const existe = coresAtuais.some(
+          (selecionada) => selecionada.nome === cor.nome && selecionada.hex === cor.hex
+        );
+
+        setCoresSelecionadasPorMaterial((anterior) => ({
+          ...anterior,
+          [chave]: existe
+            ? coresAtuais.filter(
+                (selecionada) => !(selecionada.nome === cor.nome && selecionada.hex === cor.hex)
+              )
+            : [...coresAtuais, cor],
+        }));
       };
 
       const resetFormularioCor = () => {
@@ -478,6 +515,11 @@ export default function Painel() {
                       className="p-3 border border-gray-300 rounded-xl hover:bg-gray-50"><GearIcon/></button>
                     
                   </div>
+
+                  <CoresMaterialPreview
+                    show={Boolean(novaSacola.tipo_sac)}
+                    nomesCores={obterCoresDisponiveisParaNovaSacola()}
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -745,6 +787,7 @@ export default function Painel() {
                         coresPorMaterial,
                         coresPrincipais,
                       })}
+                      coresSelecionadas={obterCoresSelecionadasDoMaterial(novoValorEnum)}
                       mostrarFormularioCor={mostrarFormularioCor}
                       novaCorNome={novaCorNome}
                       novaCorHex={novaCorHex}
@@ -753,6 +796,7 @@ export default function Painel() {
                       onNomeChange={setNovaCorNome}
                       onHexChange={setNovaCorHex}
                       onSalvarCor={() => handleAdicionarCorMaterialLocal(novoValorEnum)}
+                      onToggleCor={(cor) => handleToggleSelecaoCor(novoValorEnum, cor)}
                     />
 
                     <div className="flex gap-3">
@@ -831,6 +875,7 @@ export default function Painel() {
                           coresPorMaterial,
                           coresPrincipais,
                         })}
+                        coresSelecionadas={obterCoresSelecionadasDoMaterial(novoValorEnum)}
                         mostrarFormularioCor={mostrarFormularioCor}
                         novaCorNome={novaCorNome}
                         novaCorHex={novaCorHex}
@@ -839,6 +884,7 @@ export default function Painel() {
                         onNomeChange={setNovaCorNome}
                         onHexChange={setNovaCorHex}
                         onSalvarCor={() => handleAdicionarCorMaterialLocal(novoValorEnum)}
+                        onToggleCor={(cor) => handleToggleSelecaoCor(novoValorEnum, cor)}
                       />
                       
                       <div className="flex gap-3 mt-2">
