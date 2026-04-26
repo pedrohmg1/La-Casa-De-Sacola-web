@@ -4,6 +4,12 @@ import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import useLoginHook from "../hooks/loginHook.js" // precisa trocar pra um que valide se o usuário já está logado (ou então adicionar essa logica dentro do loginHook)
 import RotaAdmin from "../components/admin/rotaAdmin";
+import CoresMaterialSection from "../components/admin/CoresMaterialSection";
+import {
+  CORES_PRINCIPAIS_PADRAO,
+  obterCoresDoMaterial,
+  adicionarCorLocal,
+} from "../components/admin/coresMaterialLogic";
 import { useState, useEffect } from "react";
 import * as Dialog from '@radix-ui/react-dialog';
 import * as Select from '@radix-ui/react-select';
@@ -80,6 +86,48 @@ export default function Painel() {
       const [enumAtual, setEnumAtual] = useState("");
       const [novoValorEnum, setNovoValorEnum] = useState("");
       const [enumEditandoId, setEnumEditandoId] = useState(null)
+
+      const [coresPorMaterial, setCoresPorMaterial] = useState({});
+      const [coresPrincipais, setCoresPrincipais] = useState(CORES_PRINCIPAIS_PADRAO);
+      const [novaCorNome, setNovaCorNome] = useState("");
+      const [novaCorHex, setNovaCorHex] = useState("#000000");
+      const [mostrarFormularioCor, setMostrarFormularioCor] = useState(false);
+
+      const handleAdicionarCorMaterialLocal = (nomeMaterial) => {
+        const resultado = adicionarCorLocal({
+          nomeMaterial,
+          novaCorNome,
+          novaCorHex,
+          coresPrincipais,
+          coresPorMaterial,
+        });
+
+        if (!resultado.ok) {
+          if (resultado.mensagem) alert(resultado.mensagem);
+          return;
+        }
+
+        if (resultado.tipo === "principal") {
+          setCoresPrincipais(resultado.coresPrincipaisAtualizadas);
+        }
+
+        if (resultado.tipo === "material") {
+          setCoresPorMaterial((anterior) => ({
+            ...anterior,
+            [resultado.materialNormalizado]: resultado.coresDoMaterialAtualizadas,
+          }));
+        }
+
+        setNovaCorNome("");
+        setNovaCorHex("#000000");
+        setMostrarFormularioCor(false);
+      };
+
+      const resetFormularioCor = () => {
+        setMostrarFormularioCor(false);
+        setNovaCorNome("");
+        setNovaCorHex("#000000");
+      };
 
       const [modalAberto, setModalAberto] = useState(false);
 
@@ -424,6 +472,7 @@ export default function Painel() {
                       setEnumAtual('tipo');
                       setEnumEditandoId(null);
                       setNovoValorEnum("");
+                      resetFormularioCor();
                       setModalEnumAberto(true);
                       }}
                       className="p-3 border border-gray-300 rounded-xl hover:bg-gray-50"><GearIcon/></button>
@@ -505,6 +554,7 @@ export default function Painel() {
       setEnumAtual('tamanho');
       setEnumEditandoId(null);
       setNovoValorEnum("");
+      resetFormularioCor();
       setModalEnumAberto(true);
       }} className="p-3 border border-gray-300 rounded-xl hover:bg-gray-50 cursor-pointer transition">
       <GearIcon/>
@@ -632,7 +682,13 @@ export default function Painel() {
         </div>
 
         {/* Modal para novos valores de filtros (Tamanho/Material) */}
-        <Dialog.Root open={modalEnumAberto} onOpenChange={setModalEnumAberto}>
+        <Dialog.Root
+          open={modalEnumAberto}
+          onOpenChange={(aberto) => {
+            setModalEnumAberto(aberto);
+            if (!aberto) resetFormularioCor();
+          }}
+        >
           <Dialog.Portal>
             <Dialog.Overlay className="bg-black/40 fixed inset-0 z-[120]" />
             <Dialog.Content aria-describedby={undefined} className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm z-[130]">
@@ -651,6 +707,7 @@ export default function Painel() {
                     setEnumEditandoId(null);
                     setNovoValorEnum("");
                   }
+                  resetFormularioCor();
                 }}
               >
                 {/* Botões de Navegação das Abas */}
@@ -680,6 +737,24 @@ export default function Painel() {
                       onChange={(e) => setNovoValorEnum(e.target.value)}
                       autoFocus
                     />
+
+                    <CoresMaterialSection
+                      show={enumAtual === 'tipo'}
+                      nomesCores={obterCoresDoMaterial({
+                        nomeMaterial: novoValorEnum,
+                        coresPorMaterial,
+                        coresPrincipais,
+                      })}
+                      mostrarFormularioCor={mostrarFormularioCor}
+                      novaCorNome={novaCorNome}
+                      novaCorHex={novaCorHex}
+                      onAbrirFormulario={() => setMostrarFormularioCor(true)}
+                      onCancelarFormulario={resetFormularioCor}
+                      onNomeChange={setNovaCorNome}
+                      onHexChange={setNovaCorHex}
+                      onSalvarCor={() => handleAdicionarCorMaterialLocal(novoValorEnum)}
+                    />
+
                     <div className="flex gap-3">
                       <Dialog.Close asChild>
                         <button type="button" className="flex-1 p-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-bold transition">Cancelar</button>
@@ -747,6 +822,23 @@ export default function Painel() {
                         className="border border-gray-300 p-3 rounded-xl outline-none focus:border-[#5ab58f]"
                         value={novoValorEnum}
                         onChange={(e) => setNovoValorEnum(e.target.value)}
+                      />
+
+                      <CoresMaterialSection
+                        show={enumAtual === 'tipo'}
+                        nomesCores={obterCoresDoMaterial({
+                          nomeMaterial: novoValorEnum,
+                          coresPorMaterial,
+                          coresPrincipais,
+                        })}
+                        mostrarFormularioCor={mostrarFormularioCor}
+                        novaCorNome={novaCorNome}
+                        novaCorHex={novaCorHex}
+                        onAbrirFormulario={() => setMostrarFormularioCor(true)}
+                        onCancelarFormulario={resetFormularioCor}
+                        onNomeChange={setNovaCorNome}
+                        onHexChange={setNovaCorHex}
+                        onSalvarCor={() => handleAdicionarCorMaterialLocal(novoValorEnum)}
                       />
                       
                       <div className="flex gap-3 mt-2">
