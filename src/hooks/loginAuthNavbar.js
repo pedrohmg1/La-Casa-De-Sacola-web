@@ -10,20 +10,20 @@ export default function useNavbarAuth() {
   const [erro, setErro] = useState(false);
 
   useEffect(() => {
-    // Timer de segurança: se o Supabase não responder em 5 segundos,
-    // libera a navbar e sinaliza erro para exibir o toast
+    let montado = true; // Evita erros caso o usuário mude de página muito rápido
+
+    // 1. O seu Failsafe (Timeout de 5 segundos)
     const timeout = setTimeout(() => {
-      setErro(true);
-      setNavbarLoading(false);
+      if (montado) {
+        console.warn("Ativando timeout.")
+        setErro(true);
+        setNavbarLoading(false);
+      }
     }, 5000);
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      clearTimeout(timeout); // Supabase respondeu, cancela o timer
-
+    // 2. Função isolada para buscar o cargo (usada no carregamento inicial e nas mudanças)
+    const carregarPerfil = async (currentUser) => {
       try {
-        const currentUser = session?.user ?? null;
-        setUser(currentUser);
-
         if (currentUser) {
           const { data: perfil, error: perfilError } = await supabase
             .from("usuario")
@@ -31,26 +31,51 @@ export default function useNavbarAuth() {
             .eq("uuid_usu", currentUser.id)
             .single();
 
-          if (perfilError) {
-            console.error("Erro ao buscar cargo:", perfilError);
-            setErro(true);
-            return;
-          }
-
-          setCargo(perfil?.cargo ?? null);
+          if (perfilError) throw perfilError;
+          if (montado) setCargo(perfil?.cargo ?? null);
         } else {
-          setCargo(null);
+          if (montado) setCargo(null);
         }
       } catch (e) {
-        console.error("Erro inesperado na verificação:", e);
-        setErro(true);
+        console.error("Erro na verificação de cargo:", e);
+        if (montado) setErro(true);
       } finally {
-        // Sempre executa, independente do caminho percorrido acima
-        setNavbarLoading(false);
+        if (montado) {
+          // A MÁGICA AQUI: O timeout só é cancelado DEPOIS que a consulta do banco terminar.
+          // Se a consulta travar e passar de 5s, o failsafe lá de cima vai ser acionado primeiro!
+          console.warn("Limpando timeout.")
+          clearTimeout(timeout); 
+          setNavbarLoading(false);
+        }
+      }
+    };
+
+    // 3. Busca ATIVA inicial (Resolve o problema do F5)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (montado) {
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+        carregarPerfil(currentUser);
+      }
+    });
+
+    // 4. Escuta de mudanças (Ex: quando o usuário clica em Sair)
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      // Reage apenas a eventos reais de mudança de usuário para não refazer queries à toa
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
+        if (montado) {
+          const currentUser = session?.user ?? null;
+          setUser(currentUser);
+          console.warn("Ativando loading.")
+          setNavbarLoading(true); // Liga o loading enquanto re-valida o cargo
+          carregarPerfil(currentUser);
+        }
       }
     });
 
     return () => {
+      montado = false;
+      console.warn("Limpando timeout.")
       clearTimeout(timeout);
       authListener.subscription.unsubscribe();
     };
