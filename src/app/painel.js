@@ -14,6 +14,9 @@ import {
   removerCorLocal,
   salvarCoresNoBanco,
 } from "../components/admin/coresMaterialLogic";
+// import ErroAcesso from "../components/layout/ErroAcesso";
+// import useVerificaAcessoAdmin from "../hooks/verificaAcesso";
+// Depois preciso "refatorar" o hook e componente relacionado ao acesso administrador, foi erro meu -Mateus
 import { useState, useEffect } from "react";
 import * as Dialog from '@radix-ui/react-dialog';
 import * as Select from '@radix-ui/react-select';
