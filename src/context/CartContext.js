@@ -1,27 +1,66 @@
 "use client";
 import { createContext, useContext, useState, useEffect } from "react";
+import { supabase } from "../lib/supabaseClient";
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
+  const [userId, setUserId] = useState(null);
+  
+  // Novo estado que vai servir de "trava de segurança"
+  const [cartOwner, setCartOwner] = useState(null); 
 
-  // Carregar o carrinho do localStorage ao iniciar
+  // 1. Descobre quem está logado
   useEffect(() => {
-    const savedCart = localStorage.getItem("la-casa-cart");
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserId(session?.user?.id || "deslogado");
+    });
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserId(session?.user?.id || "deslogado");
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
+  // 2. Efeito de CARREGAMENTO (Muda de gaveta)
+  useEffect(() => {
+    if (!userId) return;
+
+    const storageKey = `la-casa-cart-${userId}`;
+    const savedCart = localStorage.getItem(storageKey);
+    
     if (savedCart) {
       try {
         setCartItems(JSON.parse(savedCart));
       } catch (error) {
         console.error("Erro ao carregar o carrinho:", error);
+        setCartItems([]);
+      }
+    } else {
+      setCartItems([]);
+    }
+    
+    // Assim que ele termina de carregar, ele avisa quem é o dono desse novo carrinho
+    setCartOwner(userId);
+  }, [userId]);
+
+  // 3. Efeito de SALVAMENTO
+  useEffect(() => {
+    // A TRAVA: O sistema só salva se o dono do carrinho atual bater com o status do usuário.
+    // Isso impede que os itens da sua conta vazem para a gaveta "deslogado" no momento de sair.
+    if (userId && cartOwner === userId) {
+      const storageKey = `la-casa-cart-${userId}`;
+      if (cartItems.length > 0) {
+        localStorage.setItem(storageKey, JSON.stringify(cartItems));
+      } else {
+        localStorage.removeItem(storageKey);
       }
     }
-  }, []);
-
-  // Salvar o carrinho no localStorage sempre que mudar
-  useEffect(() => {
-    localStorage.setItem("la-casa-cart", JSON.stringify(cartItems));
-  }, [cartItems]);
+  }, [cartItems, userId, cartOwner]);
 
   const addToCart = (product) => {
     setCartItems((prevItems) => {
