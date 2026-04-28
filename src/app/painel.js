@@ -270,10 +270,6 @@ export default function Painel() {
 
 
       const handleExcluirCorLocal = async (nomeMaterial, cor) => {
-        const confirmado = window.confirm(`Tem certeza que deseja excluir a cor ${cor.nome}?`);
-
-        if (!confirmado) return;
-
         //  EXCLUI NO BANCO
         if (cor.id) {
           const sucesso = await excluirCorNoBanco(cor.id);
