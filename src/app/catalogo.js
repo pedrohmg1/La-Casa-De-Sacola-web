@@ -20,95 +20,97 @@ export default function ProdutosModelos() {
   // Filtros
   const [filtroTamanho, setFiltroTamanho] = useState("");
   const [filtroTipo, setFiltroTipo] = useState("");
-  const [filtroCor, setFiltroCor] = useState("");
+  // const [filtroCor, setFiltroCor] = useState(""); // Comentado para uso futuro
   const [opcoesTipo, setOpcoesTipo] = useState([]);
   const [opcoesTamanho, setOpcoesTamanho] = useState([]);
-  const [opcoesCor, setOpcoesCor] = useState([]);
+  // const [opcoesCor, setOpcoesCor] = useState([]); // Comentado para uso futuro
 
   useEffect(() => {
     carregarOpcoesFiltros();
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
+
+    const carregarProdutos = async () => {
+    try {
+      setLoading(true);
+      const de = (paginaAtual - 1) * itensPorPagina;
+      const ate = de + itensPorPagina - 1;
+
+      // Logica de filtro de cor comentada na query
+      /* const selectQuery = filtroCor 
+        ? `*, sacola_cor!inner(cores!inner(nome_cor, hex_cor))` 
+        : `*, sacola_cor(cores(nome_cor, hex_cor))`; 
+      */
+      
+      // Query padrão sem filtro de cor ativo
+      const selectQuery = `*, sacola_cor(cores(nome_cor, hex_cor))`;
+
+      let query = supabase
+        .from('sacola')
+        .select(selectQuery, { count: 'exact' })
+        .neq('status_sac', 'Oculto');
+
+      if (filtroTipo) {
+        query = query.eq('tipo_sac', filtroTipo);
+      }
+
+      if (filtroTamanho) {
+        query = query.eq('tamanho_sac', filtroTamanho);
+      }
+
+      const { data, error, count } = await query.range(de, ate);
+
+      if (error) {
+        throw error; 
+      } 
+      
+      setProdutos(data || []);
+      setTotalPaginas(Math.ceil((count || 0) / itensPorPagina));
+
+    } catch (error) {
+      console.error("Erro ao carregar produtos:", error);
+    } finally {
+      setLoading(false); 
+    }
+  };
+
     carregarProdutos();
-  }, [paginaAtual, filtroTipo, filtroTamanho, filtroCor]);
+    return () => { isMounted = false; };
+  }, [paginaAtual, filtroTipo, filtroTamanho /*, filtroCor */]); // Dependência de cor comentada
 
   const carregarOpcoesFiltros = async () => {
-  // Busca os tipos
-  const { data: tipos } = await supabase.from('tipo').select('tipo_tip');
-  if (tipos) {
-    // Remove duplicatas transformando em um Set e depois de volta para Array
-    const tiposUnicos = [...new Set(tipos.map(t => t.tipo_tip))];
-    setOpcoesTipo(tiposUnicos);
-  }
-
-  // Faça o mesmo para tamanhos e cores para evitar o mesmo erro neles
-  const { data: tamanhos } = await supabase.from('tamanho').select('tamanho_tam');
-  if (tamanhos) {
-    const tamanhosUnicos = [...new Set(tamanhos.map(t => t.tamanho_tam))];
-    setOpcoesTamanho(tamanhosUnicos);
-  }
-
-  const { data: cores } = await supabase.from('cor').select('cor_cor');
-  if (cores) {
-    const coresUnicas = [...new Set(cores.map(c => c.cor_cor))];
-    setOpcoesCor(coresUnicas);
-  }
-};
-
-const carregarProdutos = async () => {
-  try {
-    setLoading(true); // 1. Começa a carregar
-    
-    const de = (paginaAtual - 1) * itensPorPagina;
-    const ate = de + itensPorPagina - 1;
-
-    let query = supabase
-      .from('sacola')
-      .select('*', { count: 'exact' })
-      .neq('status_sac', 'Oculto');
-
-    if (filtroTipo) {
-      query = query.eq('tipo_sac', filtroTipo);
+    const { data: tipos } = await supabase.from('tipo').select('tipo_tip');
+    if (tipos) {
+      const tiposUnicos = [...new Set(tipos.map(t => t.tipo_tip))];
+      setOpcoesTipo(tiposUnicos);
     }
 
-    if (filtroTamanho) {
-      query = query.eq('tamanho_sac', filtroTamanho);
+    const { data: tamanhos } = await supabase.from('tamanho').select('tamanho_tam');
+    if (tamanhos) {
+      const tamanhosUnicos = [...new Set(tamanhos.map(t => t.tamanho_tam))];
+      setOpcoesTamanho(tamanhosUnicos);
     }
 
-    if (filtroCor) {
-      query = query.eq('cor_sac', filtroCor);
+    // Busca de cores comentada
+    /*
+    const { data: cores } = await supabase.from('cores').select('nome_cor');
+    if (cores) {
+      const coresUnicas = [...new Set(cores.map(c => c.nome_cor))];
+      setOpcoesCor(coresUnicas);
     }
-
-    const { data, error, count } = await query.range(de, ate);
-
-    // 2. Se o Supabase reclamar, joga o erro para o catch
-    if (error) {
-      throw error; 
-    } 
-    
-    // 3. Se deu tudo certo, atualiza os estados
-    setProdutos(data || []);
-    setTotalPaginas(Math.ceil((count || 0) / itensPorPagina));
-
-  } catch (error) {
-    // 4. O CATCH captura qualquer erro (do try ou do throw acima)
-    console.error("Erro ao carregar produtos:", error);
-    
-  } finally {
-    // 5. O FINALLY executa aconteça o que acontecer, destravando a tela
-    setLoading(false); 
-  }
-};
+    */
+  };
 
   const limparFiltros = () => {
     setFiltroTipo("");
     setFiltroTamanho("");
-    setFiltroCor("");
+    // setFiltroCor(""); // Comentado
     setPaginaAtual(1);
   };
 
-  const temFiltrosAtivos = filtroTipo || filtroTamanho || filtroCor;
+  const temFiltrosAtivos = filtroTipo || filtroTamanho;
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -116,20 +118,13 @@ const carregarProdutos = async () => {
       <Navbar />
 
       <main className="flex-grow container mx-auto px-4 py-8 mt-20">
-        {/* HEADER */}
         <div className="text-center mb-16">
           <span className="inline-block bg-[#f0faf5] text-[#3ca779] text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
             Nossos Produtos
           </span>
-          <h1 
-            className="text-5xl lg:text-6xl font-extrabold text-[#264f41] mb-4" 
-            style={{ fontFamily: "'Quicksand', sans-serif" }}
-          >
+          <h1 className="text-5xl lg:text-6xl font-extrabold text-[#264f41] mb-4" style={{ fontFamily: "'Quicksand', sans-serif" }}>
             Escolha o modelo ideal
           </h1>
-          <p className="text-[#6b9e8a] text-lg max-w-2xl mx-auto">
-            Encontre a embalagem perfeita para o seu negócio. Todos os nossos modelos com personalização completa da sua arte.
-          </p>
         </div>
 
         {/* ÁREA DE FILTROS */}
@@ -168,6 +163,7 @@ const carregarProdutos = async () => {
               </select>
             </div>
 
+            {/* FILTRO DE COR COMENTADO (VISUAL E LÓGICA)
             <div className="flex flex-col min-w-[220px]">
               <label className="text-xs font-bold uppercase text-[#6b9e8a] mb-2">Cor</label>
               <select 
@@ -179,8 +175,9 @@ const carregarProdutos = async () => {
                 {opcoesCor.map(opcao => (
                   <option key={opcao} value={opcao}>{opcao}</option>
                 ))}
-              </select>
+              </select> 
             </div>
+            */}
 
             {temFiltrosAtivos && (
               <button 
@@ -208,7 +205,19 @@ const carregarProdutos = async () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {produtos.map((produto) => (
               <div key={produto.id_sac} className="group bg-white border-2 border-[#e4f4ed] rounded-3xl overflow-hidden hover:shadow-2xl hover:border-[#3ca779] transition-all duration-500 hover:-translate-y-2">
+                
+                {/* Imagem + Círculo de Cor */}
                 <div className="aspect-[4/3] bg-gradient-to-br from-[#f0faf5] to-[#e0f5ea] flex items-center justify-center text-[#6b9e8a] group-hover:from-[#e0f5ea] group-hover:to-[#c8e3d5] transition-all relative">
+                  
+                  {/* Círculo de cor */}
+                  {produto.sacola_cor?.[0]?.cores?.hex_cor && (
+                    <div 
+                      className="absolute top-4 left-4 z-10 w-8 h-8 rounded-full border-2 border-white shadow-lg"
+                      style={{ backgroundColor: produto.sacola_cor[0].cores.hex_cor }}
+                      title={produto.sacola_cor[0].cores.nome_cor}
+                    />
+                  )}
+
                   <span className="text-sm font-medium uppercase tracking-widest">Imagem em breve</span>
                   <div className="absolute top-4 right-4 bg-[#3ca779] text-white px-4 py-2 rounded-full shadow-lg">
                     <span className="text-[11px] font-black uppercase">{produto.tipo_sac}</span>
@@ -230,13 +239,6 @@ const carregarProdutos = async () => {
                       <p className="text-[#264f41] font-semibold mt-1">{produto.quantidademin_sac} un.</p>
                     </div>
                   </div>
-
-                  {produto.cor_sac && (
-                    <div className="mt-3 bg-[#f0faf5] p-3 rounded-xl border border-[#e4f4ed]">
-                      <p className="text-[10px] uppercase text-[#6b9e8a] font-bold">Cor</p>
-                      <p className="text-[#264f41] font-semibold mt-1">{produto.cor_sac}</p>
-                    </div>
-                  )}
 
                   <div className="mt-8 flex items-center justify-between border-t border-[#e4f4ed] pt-6">
                     <div>
@@ -274,98 +276,84 @@ const carregarProdutos = async () => {
           </div>
         )}
 
-        {/* PAGINAÇÃO AJUSTADA */}
-{totalPaginas > 1 && (
-  <div className="flex justify-center items-center gap-3 mt-16">
-    <button 
-      onClick={() => setPaginaAtual(prev => Math.max(prev - 1, 1))}
-      disabled={paginaAtual === 1}
-      className="p-3 rounded-2xl border-2 border-[#c8e3d5] bg-white hover:bg-[#f0faf5] hover:border-[#3ca779] disabled:opacity-30 transition-all"
-    >
-      <ChevronLeftIcon className="w-5 h-5 text-[#3ca779]" />
-    </button>
+        {/* PAGINAÇÃO */}
+        {totalPaginas > 1 && (
+          <div className="flex justify-center items-center gap-3 mt-16">
+            <button 
+              onClick={() => setPaginaAtual(prev => Math.max(prev - 1, 1))}
+              disabled={paginaAtual === 1}
+              className="p-3 rounded-2xl border-2 border-[#c8e3d5] bg-white hover:bg-[#f0faf5] hover:border-[#3ca779] disabled:opacity-30 transition-all"
+            >
+              <ChevronLeftIcon className="w-5 h-5 text-[#3ca779]" />
+            </button>
 
-    <div className="flex gap-2">
-      {(() => {
-        const paginas = [];
-        const maxBotoes = 5; // Quantidade de botões numerados centrais
+            <div className="flex gap-2">
+              {(() => {
+                const paginas = [];
+                const maxBotoes = 5; 
 
-        if (totalPaginas <= maxBotoes + 2) {
-          // Se tiver poucas páginas, mostra todas
-          for (let i = 1; i <= totalPaginas; i++) paginas.push(i);
-        } else {
-          // Lógica para muitas páginas (ex: 1, 2, 3, 4, 5 ... 10)
-          let inicio = Math.max(1, paginaAtual - 2);
-          let fim = Math.min(totalPaginas, inicio + maxBotoes - 1);
-
-          if (fim === totalPaginas) inicio = totalPaginas - maxBotoes + 1;
-
-          // Adiciona as páginas do intervalo calculado
-          for (let i = inicio; i <= fim; i++) {
-            paginas.push(i);
-          }
-
-          // Adiciona os "..." e a última página se necessário
-          return (
-            <>
-              {paginas.map((num) => (
-                <button
-                  key={num}
-                  onClick={() => setPaginaAtual(num)}
-                  className={`w-12 h-12 rounded-2xl border-2 font-bold transition-all ${
-                    paginaAtual === num 
-                      ? 'bg-[#3ca779] text-white border-[#3ca779] scale-110 shadow-lg shadow-[#3ca779]/30' 
-                      : 'bg-white text-[#264f41] border-[#c8e3d5] hover:border-[#3ca779] hover:bg-[#f0faf5]'
-                  }`}
-                >
-                  {num}
-                </button>
-              ))}
-              
-              {fim < totalPaginas && (
-                <>
-                  {fim < totalPaginas - 1 && <span className="flex items-end pb-2 text-[#3ca779] font-bold">...</span>}
+                if (totalPaginas <= maxBotoes + 2) {
+                  for (let i = 1; i <= totalPaginas; i++) paginas.push(i);
+                } else {
+                  let inicio = Math.max(1, paginaAtual - 2);
+                  let fim = Math.min(totalPaginas, inicio + maxBotoes - 1);
+                  if (fim === totalPaginas) inicio = totalPaginas - maxBotoes + 1;
+                  for (let i = inicio; i <= fim; i++) paginas.push(i);
+                  return (
+                    <>
+                      {paginas.map((num) => (
+                        <button
+                          key={num}
+                          onClick={() => setPaginaAtual(num)}
+                          className={`w-12 h-12 rounded-2xl border-2 font-bold transition-all ${
+                            paginaAtual === num 
+                              ? 'bg-[#3ca779] text-white border-[#3ca779] scale-110 shadow-lg shadow-[#3ca779]/30' 
+                              : 'bg-white text-[#264f41] border-[#c8e3d5] hover:border-[#3ca779] hover:bg-[#f0faf5]'
+                          }`}
+                        >
+                          {num}
+                        </button>
+                      ))}
+                      {fim < totalPaginas && (
+                        <>
+                          {fim < totalPaginas - 1 && <span className="flex items-end pb-2 text-[#3ca779] font-bold">...</span>}
+                          <button
+                            onClick={() => setPaginaAtual(totalPaginas)}
+                            className="w-12 h-12 rounded-2xl border-2 bg-white text-[#264f41] border-[#c8e3d5] font-bold hover:border-[#3ca779] hover:bg-[#f0faf5]"
+                          >
+                            {totalPaginas}
+                          </button>
+                        </>
+                      )}
+                    </>
+                  );
+                }
+                return paginas.map((num) => (
                   <button
-                    onClick={() => setPaginaAtual(totalPaginas)}
-                    className="w-12 h-12 rounded-2xl border-2 bg-white text-[#264f41] border-[#c8e3d5] font-bold hover:border-[#3ca779] hover:bg-[#f0faf5]"
+                    key={num}
+                    onClick={() => setPaginaAtual(num)}
+                    className={`w-12 h-12 rounded-2xl border-2 font-bold transition-all ${
+                      paginaAtual === num 
+                        ? 'bg-[#3ca779] text-white border-[#3ca779] scale-110 shadow-lg shadow-[#3ca779]/30' 
+                        : 'bg-white text-[#264f41] border-[#c8e3d5] hover:border-[#3ca779] hover:bg-[#f0faf5]'
+                    }`}
                   >
-                    {totalPaginas}
+                    {num}
                   </button>
-                </>
-              )}
-            </>
-          );
-        }
+                ));
+              })()}
+            </div>
 
-        // Caso base (poucas páginas)
-        return paginas.map((num) => (
-          <button
-            key={num}
-            onClick={() => setPaginaAtual(num)}
-            className={`w-12 h-12 rounded-2xl border-2 font-bold transition-all ${
-              paginaAtual === num 
-                ? 'bg-[#3ca779] text-white border-[#3ca779] scale-110 shadow-lg shadow-[#3ca779]/30' 
-                : 'bg-white text-[#264f41] border-[#c8e3d5] hover:border-[#3ca779] hover:bg-[#f0faf5]'
-            }`}
-          >
-            {num}
-          </button>
-        ));
-      })()}
-    </div>
-
-    <button 
-      onClick={() => setPaginaAtual(prev => Math.min(prev + 1, totalPaginas))}
-      disabled={paginaAtual === totalPaginas}
-      className="p-3 rounded-2xl border-2 border-[#c8e3d5] bg-white hover:bg-[#f0faf5] hover:border-[#3ca779] disabled:opacity-30 transition-all"
-    >
-      <ChevronRightIcon className="w-5 h-5 text-[#3ca779]" />
-    </button>
-  </div>
-)}
+            <button 
+              onClick={() => setPaginaAtual(prev => Math.min(prev + 1, totalPaginas))}
+              disabled={paginaAtual === totalPaginas}
+              className="p-3 rounded-2xl border-2 border-[#c8e3d5] bg-white hover:bg-[#f0faf5] hover:border-[#3ca779] disabled:opacity-30 transition-all"
+            >
+              <ChevronRightIcon className="w-5 h-5 text-[#3ca779]" />
+            </button>
+          </div>
+        )}
       </main>
-
-      
     </div>
   );
 }
