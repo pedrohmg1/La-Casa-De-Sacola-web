@@ -70,27 +70,53 @@ const [loadingFrete, setLoadingFrete] = useState(false);
 
 // Atualize a função calcularFrete
 const calcularFrete = async () => {
-  // Validação Regex para CEP (formatos 00000000 ou 00000-000)
-  const cepRegex = /^\d{5}-?\d{3}$|^\d{8}$/;
-  
-  if (!cepRegex.test(cep)) {
-    toast.error("Formato de CEP inválido. Use 00000-000.");
+  // Limpa o CEP (tira o traço, se houver, para a validação de tamanho)
+  const cepLimpo = cep.replace(/\D/g, '');
+
+  if (cepLimpo.length !== 8) {
+    toast.error("Insira um CEP válido.");
     return;
   }
 
   setLoadingFrete(true);
-  
-  // Simulação de chamada de API (Melhor Envio)
+
   try {
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Delay simulando rede
-    
-    // Simulação de cálculo aleatório entre 15 e 40 reais
-    const freteSimulado = (Math.random() * (50 - 20) + 15).toFixed(2);
-    
-    setValorFrete(parseFloat(freteSimulado));
-    toast.success("Frete calculado com sucesso!");
+    const response = await fetch('/api/frete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        cepDestino: cepLimpo,
+        pacotes: cartItems.map(item => ({
+          id: item.id_sac,
+          weight: 0.5, // Peso em kg (ajuste conforme seu produto)
+          width: 15,   // Largura em cm
+          height: 15,  // Altura em cm
+          length: 15,  // Comprimento em cm
+          quantity: item.quantity,
+          insurance_value: item.precounitario_sac
+        }))
+      })
+    });
+
+    const data = await response.json();
+
+    // O Melhor Envio retorna um array de transportadoras. 
+    // Aqui pegamos a primeira que não tem erro (ex: Correios PAC)
+    const freteValido = data.find(opcao => !opcao.error);
+
+    if (freteValido) {
+      setValorFrete(parseFloat(freteValido.price));
+      toast.success(`Frete calculado: ${freteValido.name}`);
+    } else {
+      toast.error("Nenhuma transportadora disponível para este CEP.");
+      setValorFrete(0);
+    }
+
   } catch (error) {
-    toast.error("Erro ao calcular frete. Tente novamente.");
+    console.error("Erro na requisição:", error);
+    toast.error("Falha ao calcular o frete.");
   } finally {
     setLoadingFrete(false);
   }
