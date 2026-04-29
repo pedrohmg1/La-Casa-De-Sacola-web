@@ -65,14 +65,62 @@ export default function CarrinhoPage() {
 
   const total = subtotal + valorFrete;
 
-  const calcularFrete = () => {
-    if (cep.length >= 8) {
-      toast.success("Frete calculado!");
-      setValorFrete(25.90);
+  // Adicione estes estados dentro do seu componente
+const [loadingFrete, setLoadingFrete] = useState(false);
+
+// Atualize a função calcularFrete
+const calcularFrete = async () => {
+  // Limpa o CEP (tira o traço, se houver, para a validação de tamanho)
+  const cepLimpo = cep.replace(/\D/g, '');
+
+  if (cepLimpo.length !== 8) {
+    toast.error("Insira um CEP válido.");
+    return;
+  }
+
+  setLoadingFrete(true);
+
+  try {
+    const response = await fetch('/api/frete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        cepDestino: cepLimpo,
+        pacotes: cartItems.map(item => ({
+          id: item.id_sac,
+          weight: 0.5, // Peso em kg (ajuste conforme seu produto)
+          width: 15,   // Largura em cm
+          height: 15,  // Altura em cm
+          length: 15,  // Comprimento em cm
+          quantity: item.quantity,
+          insurance_value: item.precounitario_sac
+        }))
+      })
+    });
+
+    const data = await response.json();
+
+    // O Melhor Envio retorna um array de transportadoras. 
+    // Aqui pegamos a primeira que não tem erro (ex: Correios PAC)
+    const freteValido = data.find(opcao => !opcao.error);
+
+    if (freteValido) {
+      setValorFrete(parseFloat(freteValido.price));
+      toast.success(`Frete calculado: ${freteValido.name}`);
     } else {
-      toast.error("Insira um CEP válido.");
+      toast.error("Nenhuma transportadora disponível para este CEP.");
+      setValorFrete(0);
     }
-  };
+
+  } catch (error) {
+    console.error("Erro na requisição:", error);
+    toast.error("Falha ao calcular o frete.");
+  } finally {
+    setLoadingFrete(false);
+  }
+};
 
   // Enquanto verifica o login/tipo de usuário, exibe um estado de carregamento ou nada
   if (loading) return null; 
@@ -197,11 +245,12 @@ export default function CarrinhoPage() {
                             maxLength="9"
                           />
                           <button 
-                            onClick={calcularFrete}
-                            className="bg-[#f0faf5] text-[#3ca779] font-bold px-4 py-2 rounded-xl border border-[#e4f4ed] hover:bg-[#e4f4ed] transition-colors text-sm"
-                          >
-                            OK
-                          </button>
+  onClick={calcularFrete}
+  disabled={loadingFrete}
+  className="bg-[#f0faf5] text-[#3ca779] font-bold px-4 py-2 rounded-xl border border-[#e4f4ed] hover:bg-[#e4f4ed] transition-colors text-sm disabled:opacity-50"
+>
+  {loadingFrete ? "Calculando..." : "OK"}
+</button>
                         </div>
                       )}
 
