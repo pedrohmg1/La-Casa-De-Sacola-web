@@ -99,7 +99,7 @@ export default function PedidosPage() {
                       </p>
                     )}
                   </div>
-                  <p className="text-sm text-gray-500">Valor Total: <span className="font-bold text-[#3ca779]">R$ {Number(pedido.total_ped).toFixed(2)}</span></p>
+                  <p className="text-sm text-gray-500">Valor Total: <span className="font-bold text-[#3ca779]">R$ {Number(pedido.valor_total || 0).toFixed(2)}</span></p>
                 </div>
               </div>
 
