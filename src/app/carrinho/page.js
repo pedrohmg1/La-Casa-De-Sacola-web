@@ -137,9 +137,9 @@ const finalizarCompra = async () => {
     const { data: pedido, error: pedidoError } = await supabase
       .from("pedido")
       .insert({
-        uuid_usu: user.id,
+        usu_uuid: user.id,
         valor_total: total,
-        status: "pendente"
+        status_ped: "pendente"
       })
       .select()
       .single();
